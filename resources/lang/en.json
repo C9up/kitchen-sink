@@ -1,0 +1,29 @@
+{
+  "app": {
+    "name": "Kitchen Sink",
+    "tagline": "A full-stack tour of the Ream framework"
+  },
+  "project": {
+    "title": "Project: {name}",
+    "visibility": {
+      "public": "Public",
+      "private": "Private"
+    },
+    "tasks": {
+      "heading": "Tasks",
+      "empty": "No tasks yet",
+      "status": {
+        "todo": "To do",
+        "doing": "In progress",
+        "done": "Done"
+      }
+    },
+    "comments": {
+      "heading": "Comments",
+      "empty": "No comments yet"
+    }
+  },
+  "meta": {
+    "description": "Browse the {name} project on Kitchen Sink"
+  }
+}
