@@ -1,0 +1,11 @@
+{
+  "extends": "@c9up/ream/tsconfig.app.json",
+  "compilerOptions": {
+    "paths": {
+      "#modules/*": ["./app/modules/*"],
+      "#config/*": ["./config/*"],
+      "#exceptions/*": ["./app/exceptions/*"],
+      "#start/*": ["./start/*"]
+    }
+  }
+}

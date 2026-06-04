@@ -1,0 +1,15 @@
+node_modules/
+target/
+dist/
+*.node
+.env
+.env.*
+.env-*
+.DS_Store
+.turbo/
+coverage/
+*.log
+
+# App-local working data
+data/*.db
+data/storage/attachments/

@@ -1,0 +1,3 @@
+{
+  "extends": "../../packages/ream/swcrc.app.json"
+}
