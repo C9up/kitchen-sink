@@ -1,3 +1,4 @@
+import tailwindcss from "@tailwindcss/vite";
 import vue from "@vitejs/plugin-vue";
 import { defineConfig } from "vite";
 
@@ -8,7 +9,7 @@ import { defineConfig } from "vite";
  *     --outDir public/build/vue/ssr                                   (SSR)
  */
 export default defineConfig({
-	plugins: [vue()],
+	plugins: [vue(), tailwindcss()],
 	build: {
 		manifest: true,
 		outDir: "public/build/vue",

@@ -46,11 +46,13 @@
     "@c9up/helix": "workspace:*",
     "@swc-node/register": "^1.11.1",
     "@sveltejs/vite-plugin-svelte": "^5",
+    "@tailwindcss/vite": "^4",
     "@types/node": "*",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^4",
     "@vitejs/plugin-vue": "^5",
+    "tailwindcss": "^4",
     "tsx": "^4.20.6",
     "typescript": "^6.0.2",
     "vite": "^6"

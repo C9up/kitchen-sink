@@ -1,3 +1,4 @@
+import "../app.css";
 import { hydrate } from "@c9up/photon/client";
 
 /** Vue client entry — Photon dispatches to the Vue adapter (`createSSRApp().mount`). */
