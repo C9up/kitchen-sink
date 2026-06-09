@@ -13,3 +13,6 @@ coverage/
 # App-local working data
 data/*.db
 data/storage/attachments/
+
+# Vite/Photon build output
+public/build/

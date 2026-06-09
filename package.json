@@ -13,6 +13,9 @@
   "scripts": {
     "dev": "node --import @swc-node/register/esm-register --watch bin/server.ts",
     "start": "node --import @swc-node/register/esm-register bin/server.ts",
+    "build:client": "vite build",
+    "build:ssr": "vite build --ssr resources/ssr.tsx --outDir public/build/ssr",
+    "build:front": "pnpm build:client && pnpm build:ssr",
     "test": "node --import @swc-node/register/esm-register $(node -p \"require.resolve('@c9up/helix/bin/helix.js')\") test tests/ --timeout=60000 --tsx=false --threads=1"
   },
   "dependencies": {
@@ -33,13 +36,23 @@
     "@c9up/sigil": "workspace:*",
     "@c9up/spectrum": "workspace:*",
     "@c9up/warden": "workspace:*",
-    "reflect-metadata": "^0.2.2"
+    "react": "^19",
+    "react-dom": "^19",
+    "reflect-metadata": "^0.2.2",
+    "svelte": "^5",
+    "vue": "^3"
   },
   "devDependencies": {
     "@c9up/helix": "workspace:*",
     "@swc-node/register": "^1.11.1",
+    "@sveltejs/vite-plugin-svelte": "^5",
     "@types/node": "*",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^4",
+    "@vitejs/plugin-vue": "^5",
     "tsx": "^4.20.6",
-    "typescript": "^6.0.2"
+    "typescript": "^6.0.2",
+    "vite": "^6"
   }
 }

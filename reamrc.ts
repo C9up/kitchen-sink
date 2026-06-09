@@ -21,6 +21,7 @@ export default defineConfig({
 	preloads: [
 		() => import("./start/kernel.js"),
 		() => import("./start/services.js"),
+		() => import("./start/web.js"),
 	],
 
 	modules: {
