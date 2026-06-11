@@ -1,4 +1,5 @@
-import { afterAll, beforeAll, describe, expect, it, type TestClient } from "@c9up/helix";
+import { afterAll, beforeAll, describe, expect, it } from "@c9up/helix";
+import type { TestClient } from "@c9up/ream/testing";
 import { createClient, forceExitAfter } from "./_helpers.js";
 
 let client: TestClient;
@@ -81,7 +82,9 @@ describe("kitchen-sink > E2E > workspace > create + list", () => {
 			.header("authorization", `Bearer ${bobToken}`)
 			.send();
 		expect(res.status).toBe(200);
-		expect((res.json() as { workspaces: unknown[] }).workspaces).toHaveLength(0);
+		expect((res.json() as { workspaces: unknown[] }).workspaces).toHaveLength(
+			0,
+		);
 	});
 
 	it("anonymous requests are rejected with 401", async () => {
@@ -107,9 +110,9 @@ describe("kitchen-sink > E2E > workspace > create + list", () => {
 			.json({ name: "Acme HQ" })
 			.send();
 		expect(res.status).toBe(201);
-		expect(
-			(res.json() as { workspace: { slug: string } }).workspace.slug,
-		).toBe("acme-hq-2");
+		expect((res.json() as { workspace: { slug: string } }).workspace.slug).toBe(
+			"acme-hq-2",
+		);
 	});
 });
 
@@ -144,8 +147,9 @@ describe("kitchen-sink > E2E > workspace > invite + accept", () => {
 			.get("/workspaces")
 			.header("authorization", `Bearer ${bobToken}`)
 			.send();
-		const wsList = (list.json() as { workspaces: Array<{ id: string; role: string }> })
-			.workspaces;
+		const wsList = (
+			list.json() as { workspaces: Array<{ id: string; role: string }> }
+		).workspaces;
 		expect(wsList.some((w) => w.id === workspaceId && w.role === "admin")).toBe(
 			true,
 		);

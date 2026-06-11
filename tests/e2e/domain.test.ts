@@ -1,11 +1,5 @@
-import {
-	afterAll,
-	beforeAll,
-	describe,
-	expect,
-	it,
-	type TestClient,
-} from "@c9up/helix";
+import { afterAll, beforeAll, describe, expect, it } from "@c9up/helix";
+import type { TestClient } from "@c9up/ream/testing";
 import { createClient, forceExitAfter } from "./_helpers.js";
 
 let client: TestClient;
@@ -42,7 +36,8 @@ beforeAll(async () => {
 			locale: "en",
 		})
 		.send();
-	memberToken = (member.json() as { token: string; user: { id: string } }).token;
+	memberToken = (member.json() as { token: string; user: { id: string } })
+		.token;
 	memberId = (member.json() as { user: { id: string } }).user.id;
 
 	const ws = await client
@@ -50,9 +45,7 @@ beforeAll(async () => {
 		.header("authorization", `Bearer ${ownerToken}`)
 		.json({ name: "Demo Co" })
 		.send();
-	workspaceSlug = (
-		ws.json() as { workspace: { slug: string } }
-	).workspace.slug;
+	workspaceSlug = (ws.json() as { workspace: { slug: string } }).workspace.slug;
 
 	const wsId = (ws.json() as { workspace: { id: string } }).workspace.id;
 	// Invite + accept the member so cross-membership flows in this file
@@ -63,9 +56,8 @@ beforeAll(async () => {
 		.header("authorization", `Bearer ${ownerToken}`)
 		.json({ email: "member@example.com", role: "member" })
 		.send();
-	const token = (
-		inv.json() as { invitation: { token: string } }
-	).invitation.token;
+	const token = (inv.json() as { invitation: { token: string } }).invitation
+		.token;
 	await client
 		.post(`/invitations/${token}/accept`)
 		.header("authorization", `Bearer ${memberToken}`)
@@ -137,9 +129,9 @@ describe("kitchen-sink > E2E > domain > project", () => {
 			.get(`/workspaces/${workspaceSlug}/projects/public-wiki`)
 			.send();
 		expect(anon.status).toBe(200);
-		expect(
-			(anon.json() as { project: { slug: string } }).project.slug,
-		).toBe("public-wiki");
+		expect((anon.json() as { project: { slug: string } }).project.slug).toBe(
+			"public-wiki",
+		);
 	});
 });
 
@@ -161,7 +153,13 @@ describe("kitchen-sink > E2E > domain > task lifecycle", () => {
 			.send();
 		expect(res.status).toBe(201);
 		const body = res.json() as {
-			task: { id: string; status: string; priority: string; assigneeId: string; dueAt: string };
+			task: {
+				id: string;
+				status: string;
+				priority: string;
+				assigneeId: string;
+				dueAt: string;
+			};
 		};
 		expect(body.task.status).toBe("todo");
 		expect(body.task.priority).toBe("high");
@@ -190,7 +188,8 @@ describe("kitchen-sink > E2E > domain > task lifecycle", () => {
 			.send();
 		expect(res.status).toBe(201);
 		expect(
-			(res.json() as { task: { recurrenceRrule: string } }).task.recurrenceRrule,
+			(res.json() as { task: { recurrenceRrule: string } }).task
+				.recurrenceRrule,
 		).toBe("FREQ=WEEKLY;COUNT=4");
 	});
 
@@ -209,8 +208,9 @@ describe("kitchen-sink > E2E > domain > task lifecycle", () => {
 			.header("authorization", `Bearer ${ownerToken}`)
 			.json({ status: "done" })
 			.send();
-		const taskDone = (done.json() as { task: { status: string; completedAt: string | null } })
-			.task;
+		const taskDone = (
+			done.json() as { task: { status: string; completedAt: string | null } }
+		).task;
 		expect(taskDone.status).toBe("done");
 		expect(taskDone.completedAt).toBeTruthy();
 	});
@@ -381,7 +381,9 @@ describe("kitchen-sink > E2E > domain > notifications fanout", () => {
 			.header("authorization", `Bearer ${memberToken}`)
 			.send();
 		const target = (
-			list.json() as { notifications: Array<{ id: string; readAt: string | null }> }
+			list.json() as {
+				notifications: Array<{ id: string; readAt: string | null }>;
+			}
 		).notifications.find((n) => n.readAt === null);
 		expect(target).toBeDefined();
 		if (!target) return;
@@ -398,9 +400,8 @@ describe("kitchen-sink > E2E > domain > notifications fanout", () => {
 			.get("/me/notifications")
 			.header("authorization", `Bearer ${memberToken}`)
 			.send();
-		const target = (
-			list.json() as { notifications: Array<{ id: string }> }
-		).notifications[0];
+		const target = (list.json() as { notifications: Array<{ id: string }> })
+			.notifications[0];
 		expect(target).toBeDefined();
 		const res = await client
 			.post(`/me/notifications/${target.id}/read`)

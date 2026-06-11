@@ -162,8 +162,10 @@ describe("kitchen-sink > wiring > UI + i18n + time", () => {
 		expect(typeof m.RelayProvider).toBe("function");
 	});
 
-	it("@c9up/helix exposes TestClient", async () => {
-		const m = await import("@c9up/helix");
+	it("@c9up/ream/testing exposes TestClient (helix stays agnostic)", async () => {
+		// TestClient is the Ream test surface, NOT helix's — helix is framework-
+		// agnostic. It lives behind the `@c9up/ream/testing` subpath.
+		const m = await import("@c9up/ream/testing");
 		expect(typeof m.TestClient).toBe("function");
 	});
 });

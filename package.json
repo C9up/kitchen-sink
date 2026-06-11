@@ -16,7 +16,7 @@
     "build:client": "vite build",
     "build:ssr": "vite build --ssr resources/ssr.tsx --outDir public/build/ssr",
     "build:front": "pnpm build:client && pnpm build:ssr",
-    "test": "node --import @swc-node/register/esm-register $(node -p \"require.resolve('@c9up/helix/bin/helix.js')\") test tests/ --timeout=60000 --tsx=false --threads=1"
+    "test": "NODE_OPTIONS=\"--import @swc-node/register/esm-register\" node $(node -p \"require.resolve('@c9up/helix/bin/helix.js')\") test tests/ --timeout=60000 --tsx=false --threads=1"
   },
   "dependencies": {
     "@c9up/archive": "workspace:*",

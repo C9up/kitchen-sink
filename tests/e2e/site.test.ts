@@ -1,11 +1,5 @@
-import {
-	afterAll,
-	beforeAll,
-	describe,
-	expect,
-	it,
-	type TestClient,
-} from "@c9up/helix";
+import { afterAll, beforeAll, describe, expect, it } from "@c9up/helix";
+import type { TestClient } from "@c9up/ream/testing";
 import { createClient, forceExitAfter } from "./_helpers.js";
 
 /**
@@ -220,11 +214,14 @@ describe("kitchen-sink > E2E > site > live page (aurora dist + shared page + hyd
 		expect(res.body).toContain('from "@c9up/aurora/relay"');
 	});
 
-	it("refuses path traversal attempts with 403", async () => {
+	it("refuses path traversal attempts (4xx, never serves the file)", async () => {
 		const res = await client
 			.get("/_assets/aurora/..%2f..%2fpackage.json")
 			.send();
-		expect([403, 404]).toContain(res.status);
+		// The encoded `..%2f` is rejected before the lookup — 400 (malformed/
+		// traversal request) is the actual secure response; 403/404 are equally
+		// valid refusals. The only failure mode is a 200 that leaks the file.
+		expect([400, 403, 404]).toContain(res.status);
 	});
 
 	it("404s an asset that does not exist", async () => {

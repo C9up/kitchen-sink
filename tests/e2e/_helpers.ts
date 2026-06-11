@@ -1,5 +1,5 @@
 /**
- * E2E test fixtures — wires `@c9up/helix`'s TestClient (the canonical
+ * E2E test fixtures — wires `@c9up/ream/testing`'s TestClient (the canonical
  * Ream test surface) to a real Ignitor + HyperServer boot. The same
  * providers, migrations, NAPI binaries, and WAL pragmas as production
  * run here; tests assert against the actual HTTP wire, never against
@@ -28,9 +28,9 @@ import "reflect-metadata";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { TestClient } from "@c9up/helix";
 import { Ignitor } from "@c9up/ream";
 import { createHyperServerFactory } from "@c9up/ream/bootstrap";
+import { TestClient } from "@c9up/ream/testing";
 
 const APP_ROOT = new URL("../../", import.meta.url);
 

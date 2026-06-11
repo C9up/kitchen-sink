@@ -1,4 +1,5 @@
-import { afterAll, beforeAll, describe, expect, it, type TestClient } from "@c9up/helix";
+import { afterAll, beforeAll, describe, expect, it } from "@c9up/helix";
+import type { TestClient } from "@c9up/ream/testing";
 import { createClient, forceExitAfter } from "./_helpers.js";
 
 let client: TestClient;
@@ -47,7 +48,10 @@ describe("kitchen-sink > E2E > auth > signup", () => {
 			.json({ ...goodSignup, email: "bob@example.com", password: "shorty" })
 			.send();
 		expect(res.status).toBe(422);
-		const body = res.json() as { ok: boolean; errors: Array<{ field: string }> };
+		const body = res.json() as {
+			ok: boolean;
+			errors: Array<{ field: string }>;
+		};
 		expect(body.ok).toBe(false);
 		expect(body.errors.some((e) => e.field === "password")).toBe(true);
 	});
