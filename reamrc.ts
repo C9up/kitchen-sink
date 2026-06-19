@@ -27,4 +27,8 @@ export default defineConfig({
 	modules: {
 		path: "./app/modules",
 	},
+
+	// Console commands (dispatched by `bin/console.ts`). `atlas:check` verifies
+	// the app's models against the live database schema.
+	commands: [() => import("./commands/atlas-check.js")],
 });
