@@ -22,6 +22,7 @@ export default defineConfig({
 		() => import("./start/kernel.js"),
 		() => import("./start/services.js"),
 		() => import("./start/web.js"),
+		() => import("./start/live.js"),
 	],
 
 	modules: {
