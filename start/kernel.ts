@@ -5,10 +5,17 @@
  * to populate `ctx.auth` before the guard enforcer runs.
  */
 import { blackholeMiddleware } from "@c9up/blackhole/middleware";
+import { BodyParserMiddleware } from "@c9up/ream";
 import router from "@c9up/ream/services/router";
 import server from "@c9up/ream/services/server";
 
 server.errorHandler(() => import("#exceptions/handler.js"));
+
+// BodyParser parses json/form/multipart bodies into `request.body()` and
+// hydrates `request.file()` — the AdonisJS default kernel registers it
+// globally, so uploads work out of the box (no silent 422 from an
+// unparsed multipart body).
+const bodyParser = new BodyParserMiddleware();
 
 // Blackhole runs across every route now that ReamContext aligns
 // structurally with HttpContext — no adapter / cast needed.
@@ -17,5 +24,6 @@ server.errorHandler(() => import("#exceptions/handler.js"));
 // stable ordering).
 router.use([
 	blackholeMiddleware,
+	(ctx, next) => bodyParser.handle(ctx, next),
 	() => import("#middleware/auth_middleware.js"),
 ]);

@@ -1,6 +1,7 @@
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { SQLITE_PROD_PRAGMAS } from "@c9up/atlas";
+import env from "#start/env.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -8,8 +9,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 // sqlite file via env. Defaults to `data/kitchen.db` so `pnpm dev` /
 // `pnpm start` work without configuration. E2E suites use this to
 // keep per-suite DB files so parallel workers don't share a journal.
+// Read through `#start/env` (Adonis pattern): importing it loads `.env`
+// before this value is computed, in every flow incl. tests.
 const dbPath =
-	process.env.KITCHEN_DB_PATH ?? join(__dirname, "..", "data", "kitchen.db");
+	env.get("KITCHEN_DB_PATH") ?? join(__dirname, "..", "data", "kitchen.db");
 
 export default {
 	url: `sqlite:${dbPath}`,
