@@ -1,18 +1,14 @@
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { SQLITE_PROD_PRAGMAS } from "@c9up/atlas";
+import app from "@c9up/ream/services/app";
 import env from "#start/env.js";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Allow tests (or future ops scripts) to point the app at a different
 // sqlite file via env. Defaults to `data/kitchen.db` so `pnpm dev` /
 // `pnpm start` work without configuration. E2E suites use this to
 // keep per-suite DB files so parallel workers don't share a journal.
-// Read through `#start/env` (Adonis pattern): importing it loads `.env`
-// before this value is computed, in every flow incl. tests.
-const dbPath =
-	env.get("KITCHEN_DB_PATH") ?? join(__dirname, "..", "data", "kitchen.db");
+// Adonis pattern: `env.get` (loaded via #start/env) for variables, and the
+// `app` path helpers for filesystem paths — no `__dirname`/`fileURLToPath`.
+const dbPath = env.get("KITCHEN_DB_PATH") ?? app.makePath("data", "kitchen.db");
 
 export default {
 	url: `sqlite:${dbPath}`,
@@ -31,6 +27,6 @@ export default {
 	// Avoids spurious "database is locked" between consecutive test boots.
 	pragmas: { ...SQLITE_PROD_PRAGMAS, busy_timeout: 5000 },
 	migrations: {
-		path: join(__dirname, "..", "database", "migrations"),
+		path: app.migrationsPath(),
 	},
 };
