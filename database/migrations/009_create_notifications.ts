@@ -6,7 +6,7 @@ export default class CreateNotifications extends Migration {
 			t.uuid("id").primary();
 			t.uuid("user_id").notNullable().references("users");
 			t.text("type").notNullable();
-			t.text("payload").notNullable().defaultTo("'{}'");
+			t.text("payload").notNullable().defaultTo("{}");
 			t.timestamp("read_at").nullable();
 			t.timestamp("created_at").notNullable();
 			// Inbox UI orders by created_at DESC + filters on read_at IS NULL,

@@ -10,7 +10,7 @@ export default class CreateUsers extends Migration {
 			t.text("email").notNullable();
 			t.text("password_hash").notNullable();
 			t.text("display_name").notNullable();
-			t.text("locale").notNullable().defaultTo("'fr'");
+			t.text("locale").notNullable().defaultTo("fr");
 			t.timestamp("created_at").notNullable();
 			t.timestamp("updated_at").notNullable();
 			t.timestamp("deleted_at").nullable();
