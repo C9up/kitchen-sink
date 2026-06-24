@@ -16,9 +16,7 @@ export default defineConfig({
 		() => import("@c9up/bay/provider"),
 		() => import("@c9up/rosetta/provider"),
 		() => import("@c9up/aurora/provider"),
-		// RpcProvider is a named export of @c9up/ream (no /provider subpath) —
-		// adapt it to the default-export shape the providers list expects.
-		() => import("@c9up/ream").then((m) => ({ default: m.RpcProvider })),
+		() => import("@c9up/ream/rpc/provider"),
 	],
 
 	preloads: [
