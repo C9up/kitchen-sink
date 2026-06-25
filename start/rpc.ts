@@ -4,7 +4,7 @@
  * mounts `POST /rpc`; these methods are exercised end-to-end by
  * `tests/e2e/rpc.test.ts` through aurora's `createRpcClient`.
  */
-import type { RpcRouter } from "@c9up/ream";
+import type { RpcRouter } from "@c9up/ream/rpc/router";
 import app from "@c9up/ream/services/app";
 
 const rpc = app.container.make<RpcRouter>("rpc");

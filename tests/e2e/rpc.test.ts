@@ -4,7 +4,7 @@
  * ephemeral port. Proves the browser client speaks the exact wire the server
  * expects: result, error, and batch. Demo methods live in `start/rpc.ts`.
  */
-import { createRpcClient, isRpcError, type RpcClient } from "@c9up/aurora";
+import { createRpcClient, isRpcError, type RpcClient } from "@c9up/aurora/rpc";
 import { afterAll, beforeAll, describe, expect, it } from "@c9up/helix";
 import type { TestClient } from "@c9up/ream/testing";
 import { createClient, forceExitAfter } from "./_helpers.js";
