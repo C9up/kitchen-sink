@@ -69,7 +69,7 @@ export class AuthService {
 	): Promise<User | null> {
 		const user = await this.findByEmail(email);
 		if (!user) return null;
-		const ok = await this.hasher.verify(password, user.passwordHash);
+		const ok = await this.hasher.verify(user.passwordHash, password);
 		return ok ? user : null;
 	}
 }
