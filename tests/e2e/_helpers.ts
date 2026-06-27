@@ -84,6 +84,14 @@ export function createClient(): TestClient {
  */
 export function forceExitAfter(): void {
 	setImmediate(() => {
-		process.exit(0);
+		// Drain stdout + stderr BEFORE the hard exit. With open SSE / tokio
+		// sockets still alive server-side (site.test.ts), a bare `process.exit(0)`
+		// truncates helix's just-written result frame → the parent reports
+		// "worker closed stderr before emitting a framed result" even though every
+		// test passed. `write('', cb)` fires `cb` once the stream is flushed.
+		Promise.all([
+			new Promise<void>((resolve) => process.stdout.write("", () => resolve())),
+			new Promise<void>((resolve) => process.stderr.write("", () => resolve())),
+		]).then(() => process.exit(0));
 	});
 }

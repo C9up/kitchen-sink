@@ -183,20 +183,22 @@ describe("kitchen-sink > E2E > site > live page (aurora dist + shared page + hyd
 			.send();
 		expect(res.status).toBe(200);
 		expect(res.body).toMatch(/<script type="importmap">/);
-		expect(res.body).toContain('"@c9up/aurora":"/_assets/aurora/index.js"');
+		expect(res.body).toContain('"@c9up/aurora":"/__assets/aurora/index.js"');
 		expect(res.body).toMatch(
 			/<script id="aurora-page-data" type="application\/json">/,
 		);
 		expect(res.body).toContain('"name":"ProjectPage"');
 		expect(res.body).toContain('"channel":"project/');
-		expect(res.body).toContain("import { hydrate } from '@c9up/aurora'");
 		expect(res.body).toContain(
-			'import Page from "/_assets/pages/ProjectPage.js"',
+			"import { hydrate, setRouteManifest } from '@c9up/aurora'",
+		);
+		expect(res.body).toContain(
+			'import Page from "/__assets/pages/ProjectPage.js"',
 		);
 	});
 
 	it("serves aurora/dist/index.js as browser-ready ESM", async () => {
-		const res = await client.get("/_assets/aurora/index.js").send();
+		const res = await client.get("/__assets/aurora/index.js").send();
 		expect(res.status).toBe(200);
 		expect(res.headers["content-type"]).toMatch(/javascript/);
 		// Aurora's index.js re-exports every public symbol — verifying a
@@ -207,7 +209,7 @@ describe("kitchen-sink > E2E > site > live page (aurora dist + shared page + hyd
 	});
 
 	it("serves the app's shared ProjectPage module", async () => {
-		const res = await client.get("/_assets/pages/ProjectPage.js").send();
+		const res = await client.get("/__assets/pages/ProjectPage.js").send();
 		expect(res.status).toBe(200);
 		expect(res.headers["content-type"]).toMatch(/javascript/);
 		expect(res.body).toContain('from "@c9up/aurora"');
@@ -216,7 +218,7 @@ describe("kitchen-sink > E2E > site > live page (aurora dist + shared page + hyd
 
 	it("refuses path traversal attempts (4xx, never serves the file)", async () => {
 		const res = await client
-			.get("/_assets/aurora/..%2f..%2fpackage.json")
+			.get("/__assets/aurora/..%2f..%2fpackage.json")
 			.send();
 		// The encoded `..%2f` is rejected before the lookup — 400 (malformed/
 		// traversal request) is the actual secure response; 403/404 are equally
@@ -225,7 +227,7 @@ describe("kitchen-sink > E2E > site > live page (aurora dist + shared page + hyd
 	});
 
 	it("404s an asset that does not exist", async () => {
-		const res = await client.get("/_assets/aurora/nope.js").send();
+		const res = await client.get("/__assets/aurora/nope.js").send();
 		expect(res.status).toBe(404);
 	});
 });

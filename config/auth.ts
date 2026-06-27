@@ -64,4 +64,15 @@ export default {
 			return u ? toPayload(u) : null;
 		},
 	},
+	// Cookie/session guard alongside JWT (dual-guard): browser/web routes use
+	// `@Guard('session')` (cookie auto-sent, CSRF-protected), API/mobile keep
+	// `@Guard('jwt')` (Bearer, CSRF-immune). `defaultStrategy` stays jwt so
+	// existing default-jwt routes/tests are unaffected.
+	session: {
+		async findUser(id: string | number): Promise<UserPayload | null> {
+			const svc = app.container.make<AuthService>(AuthService);
+			const u = await svc.findById(String(id));
+			return u ? toPayload(u) : null;
+		},
+	},
 };

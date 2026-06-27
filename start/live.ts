@@ -1,7 +1,7 @@
 /**
  * Live components demo — a server-resident counter, wired end-to-end on the
  * SERVER side: `GET /live-counter` mounts a session + server-renders it +
- * embeds the mount ids; `wireLiveEvents` registers `POST /_live/event` which
+ * embeds the mount ids; `wireLiveEvents` registers `POST /__live/event` which
  * dispatches client events to the session, whose patches broadcast over relay.
  *
  * The server half is exercised by `tests/e2e/live.test.ts` (real Ignitor +
@@ -31,7 +31,7 @@ registry.define("Counter", () => {
 });
 
 const live = createLiveRouter(registry, relay);
-wireLiveEvents(router, live); // POST /_live/event
+wireLiveEvents(router, live); // POST /__live/event
 
 // Relay is fail-closed: a channel with no authorizer rejects subscriptions
 // (403). Authorize the per-session live channel. (Demo: allow-all. Production:
@@ -44,7 +44,7 @@ router.get("/live-counter", (ctx) => {
 	const { id, channel, html: markup } = live.mount("Counter", ctx.id);
 	ctx.response.send(`<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><title>Live Counter</title>
-<script type="importmap">{"imports":{"@c9up/aurora":"/_assets/aurora/index.js","@c9up/aurora/relay":"/_assets/aurora/relay.js"}}</script>
+<script type="importmap">{"imports":{"@c9up/aurora":"/__assets/aurora/index.js","@c9up/aurora/relay":"/__assets/aurora/relay.js"}}</script>
 </head>
 <body>
 <div id="app" data-live-id="${id}" data-live-channel="${channel}">${markup}</div>

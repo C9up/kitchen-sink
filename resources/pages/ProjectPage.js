@@ -1,7 +1,7 @@
 /**
  * Shared SSR + hydrate page — same source runs on the server (Node, via
  * @swc-node/register) and in the browser (loaded through aurora's
- * `/_assets/pages/*` mount + the importmap that aliases `@c9up/aurora`).
+ * `/__assets/pages/*` mount + the importmap that aliases `@c9up/aurora`).
  *
  * Plain ESM JS on purpose: zero compile step for app code.
  *

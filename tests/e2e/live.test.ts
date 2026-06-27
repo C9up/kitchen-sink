@@ -29,29 +29,29 @@ describe("kitchen-sink > e2e > live components", () => {
 		expect(res.body).toMatch(/data-live-channel="live\/[^"]+"/);
 	});
 
-	it("POST /_live/event dispatches the event to the mounted session", async () => {
+	it("POST /__live/event dispatches the event to the mounted session", async () => {
 		const page = await client.get("/live-counter").send();
 		const id = /data-live-id="([^"]+)"/.exec(page.body)?.[1];
 		expect(id).toBeTruthy();
 
 		const res = await client
-			.post("/_live/event")
+			.post("/__live/event")
 			.json({ id, event: "increment" })
 			.send();
 		expect(res.status).toBe(200);
 		expect(res.json()).toEqual({ ok: true });
 	});
 
-	it("POST /_live/event with an unknown session id → 404", async () => {
+	it("POST /__live/event with an unknown session id → 404", async () => {
 		const res = await client
-			.post("/_live/event")
+			.post("/__live/event")
 			.json({ id: "ghost", event: "increment" })
 			.send();
 		expect(res.status).toBe(404);
 	});
 
-	it("POST /_live/event with a malformed body → 400", async () => {
-		const res = await client.post("/_live/event").json({ nope: true }).send();
+	it("POST /__live/event with a malformed body → 400", async () => {
+		const res = await client.post("/__live/event").json({ nope: true }).send();
 		expect(res.status).toBe(400);
 	});
 });
