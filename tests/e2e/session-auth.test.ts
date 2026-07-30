@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from "@c9up/helix";
-import type { TestClient } from "@c9up/ream/testing";
+import type { ApiResponse, TestClient } from "@c9up/ream/testing";
 import { createClient, forceExitAfter } from "./_helpers.js";
 
 /**
@@ -31,23 +31,20 @@ afterAll(async () => {
 });
 
 /** Pull a cookie value out of a response's `Set-Cookie` header. */
-function setCookie(
-	res: { headers: Record<string, string> },
-	name: string,
-): string | undefined {
-	const raw = res.headers["set-cookie"] ?? "";
+function setCookie(res: ApiResponse, name: string): string | undefined {
+	const raw = res.headers()["set-cookie"] ?? "";
 	return raw.match(new RegExp(`(?:^|[;,\\s])${name}=([^;]+)`))?.[1];
 }
 
 describe("kitchen-sink > E2E > dual-guard > session/cookie", () => {
 	it("rejects /download without a session (guard('session') → 401)", async () => {
 		const res = await client.get("/download/42").send();
-		expect(res.status).toBe(401);
+		expect(res.status()).toBe(401);
 	});
 
 	it("rejects session login POST with no CSRF token (403)", async () => {
 		const res = await client.post("/login").json(creds).send();
-		expect(res.status).toBe(403);
+		expect(res.status()).toBe(403);
 	});
 
 	it("seeds XSRF on GET, logs in by cookie, and the download knows who", async () => {
@@ -64,7 +61,7 @@ describe("kitchen-sink > E2E > dual-guard > session/cookie", () => {
 			.cookie("XSRF-TOKEN", xsrf)
 			.json(creds)
 			.send();
-		expect(login.status).toBe(200);
+		expect(login.status()).toBe(200);
 		const body = login.json() as { ok: boolean; user: { id: string } };
 		expect(body.ok).toBe(true);
 		const session = setCookie(login, "ream_session");
@@ -77,8 +74,8 @@ describe("kitchen-sink > E2E > dual-guard > session/cookie", () => {
 			.get("/download/42")
 			.cookie("ream_session", session)
 			.send();
-		expect(dl.status).toBe(200);
-		expect(dl.headers["content-disposition"]).toContain("doc-42.txt");
-		expect(dl.body).toContain(body.user.id);
+		expect(dl.status()).toBe(200);
+		expect(dl.headers()["content-disposition"]).toContain("doc-42.txt");
+		expect(dl.text()).toContain(body.user.id);
 	});
 });

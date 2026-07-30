@@ -24,7 +24,7 @@ const goodSignup = {
 describe("kitchen-sink > E2E > auth > signup", () => {
 	it("creates the user, hashes the password, returns a JWT", async () => {
 		const res = await client.post("/auth/signup").json(goodSignup).send();
-		expect(res.status).toBe(201);
+		expect(res.status()).toBe(201);
 		const body = res.json() as {
 			ok: boolean;
 			user: { id: string; email: string; displayName: string };
@@ -39,7 +39,7 @@ describe("kitchen-sink > E2E > auth > signup", () => {
 
 	it("rejects duplicate email with 409", async () => {
 		const res = await client.post("/auth/signup").json(goodSignup).send();
-		expect(res.status).toBe(409);
+		expect(res.status()).toBe(409);
 	});
 
 	it("rejects weak password with 422 and a rune error list", async () => {
@@ -47,7 +47,7 @@ describe("kitchen-sink > E2E > auth > signup", () => {
 			.post("/auth/signup")
 			.json({ ...goodSignup, email: "bob@example.com", password: "shorty" })
 			.send();
-		expect(res.status).toBe(422);
+		expect(res.status()).toBe(422);
 		const body = res.json() as {
 			ok: boolean;
 			errors: Array<{ field: string }>;
@@ -61,7 +61,7 @@ describe("kitchen-sink > E2E > auth > signup", () => {
 			.post("/auth/signup")
 			.json({ ...goodSignup, email: "not-an-email" })
 			.send();
-		expect(res.status).toBe(422);
+		expect(res.status()).toBe(422);
 	});
 });
 
@@ -71,7 +71,7 @@ describe("kitchen-sink > E2E > auth > login + me + logout", () => {
 			.post("/auth/login")
 			.json({ email: goodSignup.email, password: goodSignup.password })
 			.send();
-		expect(login.status).toBe(200);
+		expect(login.status()).toBe(200);
 		const token = (login.json() as { token: string }).token;
 		expect(typeof token).toBe("string");
 
@@ -79,7 +79,7 @@ describe("kitchen-sink > E2E > auth > login + me + logout", () => {
 			.get("/me")
 			.header("authorization", `Bearer ${token}`)
 			.send();
-		expect(me.status).toBe(200);
+		expect(me.status()).toBe(200);
 		expect((me.json() as { user: { email: string } }).user.email).toBe(
 			goodSignup.email,
 		);
@@ -90,7 +90,7 @@ describe("kitchen-sink > E2E > auth > login + me + logout", () => {
 			.post("/auth/login")
 			.json({ email: goodSignup.email, password: "wrong" })
 			.send();
-		expect(res.status).toBe(401);
+		expect(res.status()).toBe(401);
 	});
 
 	it("login with unknown email returns 401 (same shape as bad password)", async () => {
@@ -98,12 +98,12 @@ describe("kitchen-sink > E2E > auth > login + me + logout", () => {
 			.post("/auth/login")
 			.json({ email: "nobody@example.com", password: "whatever-long" })
 			.send();
-		expect(res.status).toBe(401);
+		expect(res.status()).toBe(401);
 	});
 
 	it("/me without auth header returns 401", async () => {
 		const res = await client.get("/me").send();
-		expect(res.status).toBe(401);
+		expect(res.status()).toBe(401);
 	});
 
 	it("logout revokes the token via blacklist", async () => {
@@ -117,19 +117,19 @@ describe("kitchen-sink > E2E > auth > login + me + logout", () => {
 			.get("/me")
 			.header("authorization", `Bearer ${token}`)
 			.send();
-		expect(before.status).toBe(200);
+		expect(before.status()).toBe(200);
 
 		const logout = await client
 			.post("/auth/logout")
 			.header("authorization", `Bearer ${token}`)
 			.send();
-		expect(logout.status).toBe(200);
+		expect(logout.status()).toBe(200);
 		expect((logout.json() as { revoked: boolean }).revoked).toBe(true);
 
 		const after = await client
 			.get("/me")
 			.header("authorization", `Bearer ${token}`)
 			.send();
-		expect(after.status).toBe(401);
+		expect(after.status()).toBe(401);
 	});
 });

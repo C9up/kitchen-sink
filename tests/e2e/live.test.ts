@@ -23,22 +23,22 @@ afterAll(async () => {
 describe("kitchen-sink > e2e > live components", () => {
 	it("GET /live-counter mounts + server-renders the initial state", async () => {
 		const res = await client.get("/live-counter").send();
-		expect(res.status).toBe(200);
-		expect(res.body).toContain("Count: ");
-		expect(res.body).toMatch(/data-live-id="[^"]+"/);
-		expect(res.body).toMatch(/data-live-channel="live\/[^"]+"/);
+		expect(res.status()).toBe(200);
+		expect(res.text()).toContain("Count: ");
+		expect(res.text()).toMatch(/data-live-id="[^"]+"/);
+		expect(res.text()).toMatch(/data-live-channel="live\/[^"]+"/);
 	});
 
 	it("POST /__live/event dispatches the event to the mounted session", async () => {
 		const page = await client.get("/live-counter").send();
-		const id = /data-live-id="([^"]+)"/.exec(page.body)?.[1];
+		const id = /data-live-id="([^"]+)"/.exec(page.text())?.[1];
 		expect(id).toBeTruthy();
 
 		const res = await client
 			.post("/__live/event")
 			.json({ id, event: "increment" })
 			.send();
-		expect(res.status).toBe(200);
+		expect(res.status()).toBe(200);
 		expect(res.json()).toEqual({ ok: true });
 	});
 
@@ -47,11 +47,11 @@ describe("kitchen-sink > e2e > live components", () => {
 			.post("/__live/event")
 			.json({ id: "ghost", event: "increment" })
 			.send();
-		expect(res.status).toBe(404);
+		expect(res.status()).toBe(404);
 	});
 
 	it("POST /__live/event with a malformed body → 400", async () => {
 		const res = await client.post("/__live/event").json({ nope: true }).send();
-		expect(res.status).toBe(400);
+		expect(res.status()).toBe(400);
 	});
 });

@@ -52,7 +52,7 @@ describe("kitchen-sink > E2E > workspace > create + list", () => {
 			.header("authorization", `Bearer ${aliceToken}`)
 			.json({ name: "Acme HQ" })
 			.send();
-		expect(res.status).toBe(201);
+		expect(res.status()).toBe(201);
 		const body = res.json() as {
 			workspace: { id: string; name: string; slug: string; ownerId: string };
 		};
@@ -67,7 +67,7 @@ describe("kitchen-sink > E2E > workspace > create + list", () => {
 			.get("/workspaces")
 			.header("authorization", `Bearer ${aliceToken}`)
 			.send();
-		expect(res.status).toBe(200);
+		expect(res.status()).toBe(200);
 		const body = res.json() as {
 			workspaces: Array<{ id: string; role: string }>;
 		};
@@ -81,7 +81,7 @@ describe("kitchen-sink > E2E > workspace > create + list", () => {
 			.get("/workspaces")
 			.header("authorization", `Bearer ${bobToken}`)
 			.send();
-		expect(res.status).toBe(200);
+		expect(res.status()).toBe(200);
 		expect((res.json() as { workspaces: unknown[] }).workspaces).toHaveLength(
 			0,
 		);
@@ -100,7 +100,7 @@ describe("kitchen-sink > E2E > workspace > create + list", () => {
 			.header("authorization", `Bearer ${aliceToken}`)
 			.json({ name: "A" })
 			.send();
-		expect(res.status).toBe(422);
+		expect(res.status()).toBe(422);
 	});
 
 	it("a second workspace named 'Acme HQ' gets a suffixed slug", async () => {
@@ -109,7 +109,7 @@ describe("kitchen-sink > E2E > workspace > create + list", () => {
 			.header("authorization", `Bearer ${aliceToken}`)
 			.json({ name: "Acme HQ" })
 			.send();
-		expect(res.status).toBe(201);
+		expect(res.status()).toBe(201);
 		expect((res.json() as { workspace: { slug: string } }).workspace.slug).toBe(
 			"acme-hq-2",
 		);
@@ -123,7 +123,7 @@ describe("kitchen-sink > E2E > workspace > invite + accept", () => {
 			.header("authorization", `Bearer ${aliceToken}`)
 			.json({ email: "bob@example.com", role: "admin" })
 			.send();
-		expect(res.status).toBe(201);
+		expect(res.status()).toBe(201);
 		const body = res.json() as {
 			invitation: { token: string; expiresAt: string; role: string };
 		};
@@ -140,7 +140,7 @@ describe("kitchen-sink > E2E > workspace > invite + accept", () => {
 			.post(`/invitations/${invitationToken}/accept`)
 			.header("authorization", `Bearer ${bobToken}`)
 			.send();
-		expect(res.status).toBe(201);
+		expect(res.status()).toBe(201);
 		expect((res.json() as { role: string }).role).toBe("admin");
 
 		const list = await client
@@ -160,7 +160,7 @@ describe("kitchen-sink > E2E > workspace > invite + accept", () => {
 			.post(`/invitations/${invitationToken}/accept`)
 			.header("authorization", `Bearer ${bobToken}`)
 			.send();
-		expect(res.status).toBe(410);
+		expect(res.status()).toBe(410);
 	});
 
 	it("unknown token returns 404", async () => {
@@ -169,7 +169,7 @@ describe("kitchen-sink > E2E > workspace > invite + accept", () => {
 			.post(`/invitations/${fake}/accept`)
 			.header("authorization", `Bearer ${bobToken}`)
 			.send();
-		expect(res.status).toBe(404);
+		expect(res.status()).toBe(404);
 	});
 
 	it("non-member cannot invite (403)", async () => {
@@ -188,7 +188,7 @@ describe("kitchen-sink > E2E > workspace > invite + accept", () => {
 			.header("authorization", `Bearer ${eveToken}`)
 			.json({ email: "mallory@example.com", role: "member" })
 			.send();
-		expect(res.status).toBe(403);
+		expect(res.status()).toBe(403);
 	});
 
 	it("invalid role is rejected with 422", async () => {
@@ -197,7 +197,7 @@ describe("kitchen-sink > E2E > workspace > invite + accept", () => {
 			.header("authorization", `Bearer ${aliceToken}`)
 			.json({ email: "carol@example.com", role: "owner" })
 			.send();
-		expect(res.status).toBe(422);
+		expect(res.status()).toBe(422);
 	});
 });
 

@@ -119,23 +119,23 @@ describe("kitchen-sink > E2E > site > SSR page (aurora + photon + rosetta)", () 
 			.get(`/pages/workspaces/${workspaceSlug}/projects/${projectSlug}`)
 			.header("accept-language", "en-US,en;q=0.9")
 			.send();
-		expect(res.status).toBe(200);
-		expect(res.headers["content-type"]).toMatch(/text\/html/);
+		expect(res.status()).toBe(200);
+		expect(res.headers()["content-type"]).toMatch(/text\/html/);
 		// Document framing
-		expect(res.body).toMatch(/<!doctype html>/i);
-		expect(res.body).toMatch(/<html lang="en"/);
+		expect(res.text()).toMatch(/<!doctype html>/i);
+		expect(res.text()).toMatch(/<html lang="en"/);
 		// Aurora-rendered body content (English catalog)
-		expect(res.body).toContain("Project: Launch Plan");
-		expect(res.body).toContain("The launch plan");
-		expect(res.body).toContain("Tasks");
-		expect(res.body).toContain("To do");
-		expect(res.body).toContain("In progress");
-		expect(res.body).toContain("Public");
+		expect(res.text()).toContain("Project: Launch Plan");
+		expect(res.text()).toContain("The launch plan");
+		expect(res.text()).toContain("Tasks");
+		expect(res.text()).toContain("To do");
+		expect(res.text()).toContain("In progress");
+		expect(res.text()).toContain("Public");
 		// Photon-rendered head
-		expect(res.body).toMatch(
+		expect(res.text()).toMatch(
 			/<meta property="og:title" content="Project: Launch Plan"/,
 		);
-		expect(res.body).toMatch(/<meta property="og:locale" content="en"/);
+		expect(res.text()).toMatch(/<meta property="og:locale" content="en"/);
 	});
 
 	it("renders in French when Accept-Language asks for fr", async () => {
@@ -143,15 +143,15 @@ describe("kitchen-sink > E2E > site > SSR page (aurora + photon + rosetta)", () 
 			.get(`/pages/workspaces/${workspaceSlug}/projects/${projectSlug}`)
 			.header("accept-language", "fr-FR,fr;q=0.9,en;q=0.4")
 			.send();
-		expect(res.status).toBe(200);
-		expect(res.body).toMatch(/<html lang="fr"/);
-		expect(res.body).toContain("Projet : Launch Plan");
-		expect(res.body).toContain("Le plan de lancement");
-		expect(res.body).toContain("Tâches");
-		expect(res.body).toContain("À faire");
-		expect(res.body).toContain("En cours");
-		expect(res.body).toContain("Public");
-		expect(res.body).toMatch(
+		expect(res.status()).toBe(200);
+		expect(res.text()).toMatch(/<html lang="fr"/);
+		expect(res.text()).toContain("Projet : Launch Plan");
+		expect(res.text()).toContain("Le plan de lancement");
+		expect(res.text()).toContain("Tâches");
+		expect(res.text()).toContain("À faire");
+		expect(res.text()).toContain("En cours");
+		expect(res.text()).toContain("Public");
+		expect(res.text()).toMatch(
 			/<meta property="og:title" content="Projet : Launch Plan"/,
 		);
 	});
@@ -163,16 +163,16 @@ describe("kitchen-sink > E2E > site > SSR page (aurora + photon + rosetta)", () 
 			)
 			.header("accept-language", "en-US,en;q=0.9")
 			.send();
-		expect(res.status).toBe(200);
-		expect(res.body).toMatch(/<html lang="fr"/);
-		expect(res.body).toContain("Projet : Launch Plan");
+		expect(res.status()).toBe(200);
+		expect(res.text()).toMatch(/<html lang="fr"/);
+		expect(res.text()).toContain("Projet : Launch Plan");
 	});
 
 	it("404s a non-existent project", async () => {
 		const res = await client
 			.get(`/pages/workspaces/${workspaceSlug}/projects/does-not-exist`)
 			.send();
-		expect(res.status).toBe(404);
+		expect(res.status()).toBe(404);
 	});
 });
 
@@ -181,39 +181,39 @@ describe("kitchen-sink > E2E > site > live page (aurora dist + shared page + hyd
 		const res = await client
 			.get(`/pages/live/workspaces/${workspaceSlug}/projects/${projectSlug}`)
 			.send();
-		expect(res.status).toBe(200);
-		expect(res.body).toMatch(/<script type="importmap">/);
-		expect(res.body).toContain('"@c9up/aurora":"/__assets/aurora/index.js"');
-		expect(res.body).toMatch(
+		expect(res.status()).toBe(200);
+		expect(res.text()).toMatch(/<script type="importmap">/);
+		expect(res.text()).toContain('"@c9up/aurora":"/__assets/aurora/index.js"');
+		expect(res.text()).toMatch(
 			/<script id="aurora-page-data" type="application\/json">/,
 		);
-		expect(res.body).toContain('"name":"ProjectPage"');
-		expect(res.body).toContain('"channel":"project/');
-		expect(res.body).toContain(
+		expect(res.text()).toContain('"name":"ProjectPage"');
+		expect(res.text()).toContain('"channel":"project/');
+		expect(res.text()).toContain(
 			"import { hydrate, setRouteManifest } from '@c9up/aurora'",
 		);
-		expect(res.body).toContain(
+		expect(res.text()).toContain(
 			'import Page from "/__assets/pages/ProjectPage.js"',
 		);
 	});
 
 	it("serves aurora/dist/index.js as browser-ready ESM", async () => {
 		const res = await client.get("/__assets/aurora/index.js").send();
-		expect(res.status).toBe(200);
-		expect(res.headers["content-type"]).toMatch(/javascript/);
+		expect(res.status()).toBe(200);
+		expect(res.headers()["content-type"]).toMatch(/javascript/);
 		// Aurora's index.js re-exports every public symbol — verifying a
 		// couple of them is enough to prove the build actually ran.
-		expect(res.body).toContain("export");
-		expect(res.body).toContain("hydrate");
-		expect(res.body).toContain("signal");
+		expect(res.text()).toContain("export");
+		expect(res.text()).toContain("hydrate");
+		expect(res.text()).toContain("signal");
 	});
 
 	it("serves the app's shared ProjectPage module", async () => {
 		const res = await client.get("/__assets/pages/ProjectPage.js").send();
-		expect(res.status).toBe(200);
-		expect(res.headers["content-type"]).toMatch(/javascript/);
-		expect(res.body).toContain('from "@c9up/aurora"');
-		expect(res.body).toContain('from "@c9up/aurora/relay"');
+		expect(res.status()).toBe(200);
+		expect(res.headers()["content-type"]).toMatch(/javascript/);
+		expect(res.text()).toContain('from "@c9up/aurora"');
+		expect(res.text()).toContain('from "@c9up/aurora/relay"');
 	});
 
 	it("refuses path traversal attempts (4xx, never serves the file)", async () => {
@@ -223,12 +223,12 @@ describe("kitchen-sink > E2E > site > live page (aurora dist + shared page + hyd
 		// The encoded `..%2f` is rejected before the lookup — 400 (malformed/
 		// traversal request) is the actual secure response; 403/404 are equally
 		// valid refusals. The only failure mode is a 200 that leaks the file.
-		expect([400, 403, 404]).toContain(res.status);
+		expect([400, 403, 404]).toContain(res.status());
 	});
 
 	it("404s an asset that does not exist", async () => {
 		const res = await client.get("/__assets/aurora/nope.js").send();
-		expect(res.status).toBe(404);
+		expect(res.status()).toBe(404);
 	});
 });
 
@@ -359,7 +359,7 @@ describe("kitchen-sink > E2E > site > relay SSE end-to-end", () => {
 				locale: "en",
 			})
 			.send();
-		expect(outsider.status).toBe(201);
+		expect(outsider.status()).toBe(201);
 		const outsiderJson = outsider.json() as {
 			token: string;
 			user: { id: string };

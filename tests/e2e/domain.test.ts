@@ -81,7 +81,7 @@ describe("kitchen-sink > E2E > domain > project", () => {
 				descriptionEn: "The 2026 roadmap",
 			})
 			.send();
-		expect(res.status).toBe(201);
+		expect(res.status()).toBe(201);
 		const body = res.json() as {
 			project: { id: string; slug: string; visibility: string };
 		};
@@ -111,7 +111,7 @@ describe("kitchen-sink > E2E > domain > project", () => {
 		const res = await client
 			.get(`/workspaces/${workspaceSlug}/projects/roadmap-2026`)
 			.send();
-		expect(res.status).toBe(404);
+		expect(res.status()).toBe(404);
 	});
 
 	it("anonymous visitor CAN read a public project", async () => {
@@ -124,11 +124,11 @@ describe("kitchen-sink > E2E > domain > project", () => {
 				descriptionFr: "wiki public",
 			})
 			.send();
-		expect(pub.status).toBe(201);
+		expect(pub.status()).toBe(201);
 		const anon = await client
 			.get(`/workspaces/${workspaceSlug}/projects/public-wiki`)
 			.send();
-		expect(anon.status).toBe(200);
+		expect(anon.status()).toBe(200);
 		expect((anon.json() as { project: { slug: string } }).project.slug).toBe(
 			"public-wiki",
 		);
@@ -151,7 +151,7 @@ describe("kitchen-sink > E2E > domain > task lifecycle", () => {
 				dueAt,
 			})
 			.send();
-		expect(res.status).toBe(201);
+		expect(res.status()).toBe(201);
 		const body = res.json() as {
 			task: {
 				id: string;
@@ -174,7 +174,7 @@ describe("kitchen-sink > E2E > domain > task lifecycle", () => {
 			.header("authorization", `Bearer ${ownerToken}`)
 			.json({ title: "Bad date", dueAt: "not-a-date" })
 			.send();
-		expect(res.status).toBe(422);
+		expect(res.status()).toBe(422);
 	});
 
 	it("accepts a valid weekly RRULE recurrence", async () => {
@@ -186,7 +186,7 @@ describe("kitchen-sink > E2E > domain > task lifecycle", () => {
 				recurrenceRrule: "FREQ=WEEKLY;COUNT=4",
 			})
 			.send();
-		expect(res.status).toBe(201);
+		expect(res.status()).toBe(201);
 		expect(
 			(res.json() as { task: { recurrenceRrule: string } }).task
 				.recurrenceRrule,
@@ -199,7 +199,7 @@ describe("kitchen-sink > E2E > domain > task lifecycle", () => {
 			.header("authorization", `Bearer ${ownerToken}`)
 			.json({ status: "doing" })
 			.send();
-		expect(doing.status).toBe(200);
+		expect(doing.status()).toBe(200);
 		expect((doing.json() as { task: { status: string } }).task.status).toBe(
 			"doing",
 		);
@@ -253,7 +253,7 @@ describe("kitchen-sink > E2E > domain > comments + blackhole", () => {
 				body: "Looks good <script>alert('xss')</script> ship it",
 			})
 			.send();
-		expect(res.status).toBe(201);
+		expect(res.status()).toBe(201);
 		const body = res.json() as { comment: { body: string } };
 		expect(body.comment.body).not.toMatch(/<script/i);
 		expect(body.comment.body).toContain("Looks good");
@@ -266,7 +266,7 @@ describe("kitchen-sink > E2E > domain > comments + blackhole", () => {
 			.header("authorization", `Bearer ${memberToken}`)
 			.json({ body: "" })
 			.send();
-		expect(res.status).toBe(422);
+		expect(res.status()).toBe(422);
 	});
 
 	it("listing returns the sanitised body", async () => {
@@ -305,7 +305,7 @@ describe("kitchen-sink > E2E > domain > attachments via archive", () => {
 				contentBase64: base64,
 			})
 			.send();
-		expect(res.status).toBe(201);
+		expect(res.status()).toBe(201);
 		const body = res.json() as {
 			attachment: { id: string; size: number; filename: string };
 		};
@@ -324,7 +324,7 @@ describe("kitchen-sink > E2E > domain > attachments via archive", () => {
 				contentBase64: base64,
 			})
 			.send();
-		expect(res.status).toBe(422);
+		expect(res.status()).toBe(422);
 	});
 
 	it("downloads + round-trips the bytes", async () => {
@@ -332,7 +332,7 @@ describe("kitchen-sink > E2E > domain > attachments via archive", () => {
 			.get(`/attachments/${attachmentId}/download`)
 			.header("authorization", `Bearer ${ownerToken}`)
 			.send();
-		expect(res.status).toBe(200);
+		expect(res.status()).toBe(200);
 		const body = res.json() as { contentBase64: string };
 		const decoded = Buffer.from(body.contentBase64, "base64").toString("utf8");
 		expect(decoded).toBe(payload);
@@ -352,7 +352,7 @@ describe("kitchen-sink > E2E > domain > notifications fanout", () => {
 				assigneeId: memberId,
 			})
 			.send();
-		expect(created.status).toBe(201);
+		expect(created.status()).toBe(201);
 
 		// `/me/notifications` triggers `queue.processOne()` internally
 		// before reading — so the test sees the notification row created
@@ -361,7 +361,7 @@ describe("kitchen-sink > E2E > domain > notifications fanout", () => {
 			.get("/me/notifications")
 			.header("authorization", `Bearer ${memberToken}`)
 			.send();
-		expect(inbox.status).toBe(200);
+		expect(inbox.status()).toBe(200);
 		const body = inbox.json() as {
 			notifications: Array<{ type: string; payload: { title: string } }>;
 		};
@@ -391,7 +391,7 @@ describe("kitchen-sink > E2E > domain > notifications fanout", () => {
 			.post(`/me/notifications/${target.id}/read`)
 			.header("authorization", `Bearer ${memberToken}`)
 			.send();
-		expect(res.status).toBe(200);
+		expect(res.status()).toBe(200);
 		expect((res.json() as { readAt: string }).readAt).toBeTruthy();
 	});
 
@@ -407,7 +407,7 @@ describe("kitchen-sink > E2E > domain > notifications fanout", () => {
 			.post(`/me/notifications/${target.id}/read`)
 			.header("authorization", `Bearer ${ownerToken}`)
 			.send();
-		expect(res.status).toBe(404);
+		expect(res.status()).toBe(404);
 	});
 });
 
