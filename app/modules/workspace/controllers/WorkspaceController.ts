@@ -27,14 +27,14 @@ export default class WorkspaceController {
 			response.status(422).json({ ok: false, errors: parsed.errors });
 			return;
 		}
-		const svc = app.container.make<WorkspaceService>(WorkspaceService);
+		const svc = await app.container.make<WorkspaceService>(WorkspaceService);
 		const workspace = await svc.create(callerId, parsed.data.name);
 		response.status(201).json({ ok: true, workspace: shape(workspace) });
 	}
 
 	async list({ response, auth }: HttpContext) {
 		const callerId = auth.user!.id as string;
-		const svc = app.container.make<WorkspaceService>(WorkspaceService);
+		const svc = await app.container.make<WorkspaceService>(WorkspaceService);
 		const rows = await svc.listForUser(callerId);
 		response.json({
 			ok: true,
@@ -50,7 +50,7 @@ export default class WorkspaceController {
 			return;
 		}
 
-		const svc = app.container.make<WorkspaceService>(WorkspaceService);
+		const svc = await app.container.make<WorkspaceService>(WorkspaceService);
 		const membership = await svc.getMembership(workspaceId, callerId);
 		if (!membership || (membership.role !== "owner" && membership.role !== "admin")) {
 			// 403 not 404 — we deliberately reveal that the workspace
@@ -90,7 +90,7 @@ export default class WorkspaceController {
 			return;
 		}
 
-		const svc = app.container.make<WorkspaceService>(WorkspaceService);
+		const svc = await app.container.make<WorkspaceService>(WorkspaceService);
 		try {
 			const { workspace, membership } = await svc.acceptInvitation(
 				token,

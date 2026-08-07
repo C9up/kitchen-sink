@@ -7,7 +7,9 @@
 import type { RpcRouter } from "@c9up/ream/rpc/router";
 import app from "@c9up/ream/services/app";
 
-const rpc = app.container.make<RpcRouter>("rpc");
+// `container.make` is async (Adonis fold parity) — a preload is an ESM
+// module, so top-level await is the right tool rather than a floating promise.
+const rpc = await app.container.make<RpcRouter>("rpc");
 
 /** Narrow an unknown JSON-RPC param to a string-keyed object. */
 function isRecord(value: unknown): value is Record<string, unknown> {

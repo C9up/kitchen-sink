@@ -62,7 +62,7 @@ router.post("/login", async (ctx) => {
 		ctx.response.status(422).json({ ok: false, error: "email + password required" });
 		return;
 	}
-	const svc = app.container.make<AuthService>(AuthService);
+	const svc = await app.container.make<AuthService>(AuthService);
 	const user = await svc.verifyCredentials(creds.email, creds.password);
 	if (!user) {
 		ctx.response.status(401).json({ ok: false, error: "Invalid credentials" });

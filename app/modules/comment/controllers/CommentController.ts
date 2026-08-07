@@ -14,13 +14,13 @@ export default class CommentController {
 			return;
 		}
 
-		const taskSvc = app.container.make<TaskService>(TaskService);
+		const taskSvc = await app.container.make<TaskService>(TaskService);
 		const task = await taskSvc.find(taskId);
 		if (!task) {
 			response.status(404).json({ ok: false, error: "task not found" });
 			return;
 		}
-		const projectSvc = app.container.make<ProjectService>(ProjectService);
+		const projectSvc = await app.container.make<ProjectService>(ProjectService);
 		if (!(await projectSvc.canAccess(task.projectId, callerId))) {
 			response.status(403).json({ ok: false, error: "forbidden" });
 			return;
@@ -31,7 +31,7 @@ export default class CommentController {
 			response.status(422).json({ ok: false, errors: parsed.errors });
 			return;
 		}
-		const svc = app.container.make<CommentService>(CommentService);
+		const svc = await app.container.make<CommentService>(CommentService);
 		const comment = await svc.create({
 			taskId,
 			authorId: callerId,
@@ -56,18 +56,18 @@ export default class CommentController {
 			response.status(400).json({ ok: false, error: "task id missing" });
 			return;
 		}
-		const taskSvc = app.container.make<TaskService>(TaskService);
+		const taskSvc = await app.container.make<TaskService>(TaskService);
 		const task = await taskSvc.find(taskId);
 		if (!task) {
 			response.status(404).json({ ok: false, error: "task not found" });
 			return;
 		}
-		const projectSvc = app.container.make<ProjectService>(ProjectService);
+		const projectSvc = await app.container.make<ProjectService>(ProjectService);
 		if (!(await projectSvc.canAccess(task.projectId, callerId))) {
 			response.status(403).json({ ok: false, error: "forbidden" });
 			return;
 		}
-		const svc = app.container.make<CommentService>(CommentService);
+		const svc = await app.container.make<CommentService>(CommentService);
 		const comments = await svc.listForTask(taskId);
 		response.json({
 			ok: true,

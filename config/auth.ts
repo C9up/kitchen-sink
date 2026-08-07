@@ -51,7 +51,7 @@ export default {
 		expiresInSeconds: 86400,
 		blacklist,
 		async findUser(id: string): Promise<UserPayload | null> {
-			const svc = app.container.make<AuthService>(AuthService);
+			const svc = await app.container.make<AuthService>(AuthService);
 			const u = await svc.findById(id);
 			return u ? toPayload(u) : null;
 		},
@@ -59,7 +59,7 @@ export default {
 			email: string,
 			password: string,
 		): Promise<UserPayload | null> {
-			const svc = app.container.make<AuthService>(AuthService);
+			const svc = await app.container.make<AuthService>(AuthService);
 			const u = await svc.verifyCredentials(email, password);
 			return u ? toPayload(u) : null;
 		},
@@ -70,7 +70,7 @@ export default {
 	// existing default-jwt routes/tests are unaffected.
 	session: {
 		async findUser(id: string | number): Promise<UserPayload | null> {
-			const svc = app.container.make<AuthService>(AuthService);
+			const svc = await app.container.make<AuthService>(AuthService);
 			const u = await svc.findById(String(id));
 			return u ? toPayload(u) : null;
 		},

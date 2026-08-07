@@ -23,7 +23,7 @@ export default class AuthController {
 			return;
 		}
 
-		const svc = app.container.make<AuthService>(AuthService);
+		const svc = await app.container.make<AuthService>(AuthService);
 		// Email uniqueness is enforced by the `users_email_unique`
 		// migration index. Pre-check first so the failure surface is a
 		// clean 409 instead of a wrapped DB-constraint error.
@@ -88,7 +88,7 @@ export default class AuthController {
 		// Pull JwtStrategy directly — revoke() is strategy-specific, not
 		// part of the AuthManager surface. The container resolves the same
 		// singleton the manager dispatches to, so the blacklist is shared.
-		const jwt = app.container.make<JwtStrategy>(JwtStrategy);
+		const jwt = await app.container.make<JwtStrategy>(JwtStrategy);
 		const revoked = await jwt.revoke(token);
 		response.json({ ok: true, revoked });
 	}

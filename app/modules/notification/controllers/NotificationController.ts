@@ -15,7 +15,7 @@ export default class NotificationController {
 		await drainQueue();
 
 		void request;
-		const svc = app.container.make<NotificationService>(NotificationService);
+		const svc = await app.container.make<NotificationService>(NotificationService);
 		const rows = await svc.listForUser(callerId);
 		response.json({
 			ok: true,
@@ -36,7 +36,7 @@ export default class NotificationController {
 			response.status(400).json({ ok: false, error: "id missing" });
 			return;
 		}
-		const svc = app.container.make<NotificationService>(NotificationService);
+		const svc = await app.container.make<NotificationService>(NotificationService);
 		const row = await svc.markRead(id, callerId);
 		if (!row) {
 			response.status(404).json({ ok: false, error: "notification not found" });

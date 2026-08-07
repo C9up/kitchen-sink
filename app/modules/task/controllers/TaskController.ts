@@ -21,7 +21,7 @@ export default class TaskController {
 			response.status(400).json({ ok: false, error: "projectId missing" });
 			return;
 		}
-		const projectSvc = app.container.make<ProjectService>(ProjectService);
+		const projectSvc = await app.container.make<ProjectService>(ProjectService);
 		if (!(await projectSvc.canAccess(projectId, callerId))) {
 			response.status(403).json({ ok: false, error: "forbidden" });
 			return;
@@ -33,7 +33,7 @@ export default class TaskController {
 			response.status(422).json({ ok: false, errors: parsed.errors });
 			return;
 		}
-		const svc = app.container.make<TaskService>(TaskService);
+		const svc = await app.container.make<TaskService>(TaskService);
 		try {
 			const task = await svc.create(
 				{
@@ -66,7 +66,7 @@ export default class TaskController {
 			response.status(400).json({ ok: false, error: "projectId missing" });
 			return;
 		}
-		const projectSvc = app.container.make<ProjectService>(ProjectService);
+		const projectSvc = await app.container.make<ProjectService>(ProjectService);
 		if (!(await projectSvc.canAccess(projectId, callerId))) {
 			response.status(403).json({ ok: false, error: "forbidden" });
 			return;
@@ -78,7 +78,7 @@ export default class TaskController {
 				? statusRaw
 				: undefined;
 
-		const svc = app.container.make<TaskService>(TaskService);
+		const svc = await app.container.make<TaskService>(TaskService);
 		const tasks = await svc.list(projectId, { status });
 		response.json({ ok: true, tasks: tasks.map(shape) });
 	}
@@ -92,13 +92,13 @@ export default class TaskController {
 			return;
 		}
 
-		const svc = app.container.make<TaskService>(TaskService);
+		const svc = await app.container.make<TaskService>(TaskService);
 		const existing = await svc.find(id);
 		if (!existing) {
 			response.status(404).json({ ok: false, error: "task not found" });
 			return;
 		}
-		const projectSvc = app.container.make<ProjectService>(ProjectService);
+		const projectSvc = await app.container.make<ProjectService>(ProjectService);
 		if (!(await projectSvc.canAccess(existing.projectId, callerId))) {
 			response.status(403).json({ ok: false, error: "forbidden" });
 			return;

@@ -88,9 +88,9 @@ describe("kitchen-sink > E2E > workspace > create + list", () => {
 	});
 
 	it("anonymous requests are rejected with 401", async () => {
-		expect((await client.get("/workspaces").send()).status).toBe(401);
+		expect((await client.get("/workspaces").send()).status()).toBe(401);
 		expect(
-			(await client.post("/workspaces").json({ name: "X" }).send()).status,
+			(await client.post("/workspaces").json({ name: "X" }).send()).status(),
 		).toBe(401);
 	});
 

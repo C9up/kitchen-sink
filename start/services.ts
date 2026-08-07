@@ -37,7 +37,7 @@ import { WorkspaceService } from "#modules/workspace/services/WorkspaceService.j
 // registered against the queue.
 queue.register(
 	"notify-assignee",
-	app.container.make<NotifyAssigneeJob>(NotifyAssigneeJob),
+	await app.container.make<NotifyAssigneeJob>(NotifyAssigneeJob),
 );
 
 // ─── Events → bay queue ─────────────────────────────────────
@@ -87,10 +87,10 @@ relay.registerRoutes((route) => {
 relay.authorize<{ id: string }>("project/:id", async (ctx, { id }) => {
 	const userId = ctx.auth?.user?.id;
 	if (typeof userId !== "string") return false;
-	const projectSvc = app.container.make<ProjectService>(ProjectService);
+	const projectSvc = await app.container.make<ProjectService>(ProjectService);
 	const project = await projectSvc.projects.find(id);
 	if (!project) return false;
-	const wsSvc = app.container.make<WorkspaceService>(WorkspaceService);
+	const wsSvc = await app.container.make<WorkspaceService>(WorkspaceService);
 	const membership = await wsSvc.getMembership(project.workspaceId, userId);
 	return membership !== null;
 });

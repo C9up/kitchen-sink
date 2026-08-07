@@ -30,7 +30,7 @@ new Ignitor(APP_ROOT, {
   .then(async (ignitor) => {
     const port = await ignitor.port()
     const { Logger } = await import('@c9up/spectrum')
-    const logger = ignitor
+    const logger = await ignitor
       .getApp()
       .container.resolve<InstanceType<typeof Logger>>('logger')
     logger.info(`kitchen-sink running on http://localhost:${port}`)

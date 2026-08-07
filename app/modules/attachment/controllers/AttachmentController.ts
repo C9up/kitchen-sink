@@ -14,13 +14,13 @@ export default class AttachmentController {
 			return;
 		}
 
-		const taskSvc = app.container.make<TaskService>(TaskService);
+		const taskSvc = await app.container.make<TaskService>(TaskService);
 		const task = await taskSvc.find(taskId);
 		if (!task) {
 			response.status(404).json({ ok: false, error: "task not found" });
 			return;
 		}
-		const projectSvc = app.container.make<ProjectService>(ProjectService);
+		const projectSvc = await app.container.make<ProjectService>(ProjectService);
 		if (!(await projectSvc.canAccess(task.projectId, callerId))) {
 			response.status(403).json({ ok: false, error: "forbidden" });
 			return;
@@ -33,7 +33,7 @@ export default class AttachmentController {
 			response.status(422).json({ ok: false, errors: parsed.errors });
 			return;
 		}
-		const svc = app.container.make<AttachmentService>(AttachmentService);
+		const svc = await app.container.make<AttachmentService>(AttachmentService);
 		const attachment = await svc.upload({
 			taskId,
 			uploadedById: callerId,
@@ -54,18 +54,18 @@ export default class AttachmentController {
 			response.status(400).json({ ok: false, error: "task id missing" });
 			return;
 		}
-		const taskSvc = app.container.make<TaskService>(TaskService);
+		const taskSvc = await app.container.make<TaskService>(TaskService);
 		const task = await taskSvc.find(taskId);
 		if (!task) {
 			response.status(404).json({ ok: false, error: "task not found" });
 			return;
 		}
-		const projectSvc = app.container.make<ProjectService>(ProjectService);
+		const projectSvc = await app.container.make<ProjectService>(ProjectService);
 		if (!(await projectSvc.canAccess(task.projectId, callerId))) {
 			response.status(403).json({ ok: false, error: "forbidden" });
 			return;
 		}
-		const svc = app.container.make<AttachmentService>(AttachmentService);
+		const svc = await app.container.make<AttachmentService>(AttachmentService);
 		const attachments = await svc.listForTask(taskId);
 		response.json({ ok: true, attachments: attachments.map(shape) });
 	}
@@ -77,19 +77,19 @@ export default class AttachmentController {
 			response.status(400).json({ ok: false, error: "id missing" });
 			return;
 		}
-		const svc = app.container.make<AttachmentService>(AttachmentService);
+		const svc = await app.container.make<AttachmentService>(AttachmentService);
 		const attachment = await svc.find(id);
 		if (!attachment) {
 			response.status(404).json({ ok: false, error: "attachment not found" });
 			return;
 		}
-		const taskSvc = app.container.make<TaskService>(TaskService);
+		const taskSvc = await app.container.make<TaskService>(TaskService);
 		const task = await taskSvc.find(attachment.taskId);
 		if (!task) {
 			response.status(404).json({ ok: false, error: "attachment task gone" });
 			return;
 		}
-		const projectSvc = app.container.make<ProjectService>(ProjectService);
+		const projectSvc = await app.container.make<ProjectService>(ProjectService);
 		if (!(await projectSvc.canAccess(task.projectId, callerId))) {
 			response.status(403).json({ ok: false, error: "forbidden" });
 			return;

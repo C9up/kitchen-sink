@@ -45,10 +45,10 @@ export default class SiteController {
 			return;
 		}
 
-		const workspaceSvc = app.container.make<WorkspaceService>(WorkspaceService);
-		const projectSvc = app.container.make<ProjectService>(ProjectService);
-		const taskSvc = app.container.make<TaskService>(TaskService);
-		const commentSvc = app.container.make<CommentService>(CommentService);
+		const workspaceSvc = await app.container.make<WorkspaceService>(WorkspaceService);
+		const projectSvc = await app.container.make<ProjectService>(ProjectService);
+		const taskSvc = await app.container.make<TaskService>(TaskService);
+		const commentSvc = await app.container.make<CommentService>(CommentService);
 
 		const localeRaw = readQueryParam(request, "locale");
 		const explicit =

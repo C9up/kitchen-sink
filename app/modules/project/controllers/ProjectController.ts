@@ -20,7 +20,7 @@ export default class ProjectController {
 			response.status(400).json({ ok: false, error: "workspace slug missing" });
 			return;
 		}
-		const wsSvc = app.container.make<WorkspaceService>(WorkspaceService);
+		const wsSvc = await app.container.make<WorkspaceService>(WorkspaceService);
 		const workspace = await wsSvc.findBySlug(wsSlug);
 		if (!workspace) {
 			response.status(404).json({ ok: false, error: "workspace not found" });
@@ -37,7 +37,7 @@ export default class ProjectController {
 			response.status(422).json({ ok: false, errors: parsed.errors });
 			return;
 		}
-		const svc = app.container.make<ProjectService>(ProjectService);
+		const svc = await app.container.make<ProjectService>(ProjectService);
 		const project = await svc.create({
 			workspaceId: workspace.id,
 			name: parsed.data.name,
@@ -57,7 +57,7 @@ export default class ProjectController {
 			response.status(400).json({ ok: false, error: "workspace slug missing" });
 			return;
 		}
-		const wsSvc = app.container.make<WorkspaceService>(WorkspaceService);
+		const wsSvc = await app.container.make<WorkspaceService>(WorkspaceService);
 		const workspace = await wsSvc.findBySlug(wsSlug);
 		if (!workspace) {
 			response.status(404).json({ ok: false, error: "workspace not found" });
@@ -69,7 +69,7 @@ export default class ProjectController {
 			return;
 		}
 
-		const svc = app.container.make<ProjectService>(ProjectService);
+		const svc = await app.container.make<ProjectService>(ProjectService);
 		const projects = await svc.listForWorkspace(workspace.id);
 		response.json({
 			ok: true,
@@ -84,7 +84,7 @@ export default class ProjectController {
 			response.status(400).json({ ok: false, error: "missing slug" });
 			return;
 		}
-		const wsSvc = app.container.make<WorkspaceService>(WorkspaceService);
+		const wsSvc = await app.container.make<WorkspaceService>(WorkspaceService);
 		const workspace = await wsSvc.findBySlug(wsSlug);
 		if (!workspace) {
 			response.status(404).json({ ok: false, error: "workspace not found" });
@@ -95,7 +95,7 @@ export default class ProjectController {
 		// `findForCaller` returns the project only if it's public or the
 		// caller is a member.
 		const callerId = (auth.user?.id as string | undefined) ?? null;
-		const svc = app.container.make<ProjectService>(ProjectService);
+		const svc = await app.container.make<ProjectService>(ProjectService);
 		const project = await svc.findForCaller(
 			workspace.id,
 			projectSlug,

@@ -35,7 +35,10 @@ function hasVerifyWithContext(value: unknown): value is StrategyWithContext {
 function applyResult(ctx: HttpContext, result: AuthResult): void {
 	if (result.authenticated && result.user) {
 		ctx.auth = {
-			authenticated: true,
+			// `isAuthenticated`, not `authenticated`: Ream renamed it for AdonisJS
+			// parity and the route guard reads the new name. Writing the old one
+			// left every `.guard(...)` route answering 401 to a valid token.
+			isAuthenticated: true,
 			user: result.user,
 			roles: result.user.roles ?? [],
 			permissions: result.user.permissions ?? [],
