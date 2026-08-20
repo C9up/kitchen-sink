@@ -26,7 +26,7 @@ export default class AttachmentController {
 			return;
 		}
 
-		const parsed = CreateAttachmentValidator.validate(
+		const parsed = CreateAttachmentValidator.validateResult(
 			(await request.body()) ?? {},
 		);
 		if (!parsed.valid) {

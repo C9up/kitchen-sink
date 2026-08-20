@@ -28,7 +28,7 @@ export default class TaskController {
 		}
 
 		const body = (await request.body()) ?? {};
-		const parsed = CreateTaskValidator.validate(body);
+		const parsed = CreateTaskValidator.validateResult(body);
 		if (!parsed.valid) {
 			response.status(422).json({ ok: false, errors: parsed.errors });
 			return;
@@ -104,7 +104,7 @@ export default class TaskController {
 			return;
 		}
 
-		const parsed = UpdateTaskValidator.validate((await request.body()) ?? {});
+		const parsed = UpdateTaskValidator.validateResult((await request.body()) ?? {});
 		if (!parsed.valid) {
 			response.status(422).json({ ok: false, errors: parsed.errors });
 			return;

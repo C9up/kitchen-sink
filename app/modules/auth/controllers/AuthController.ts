@@ -17,7 +17,7 @@ import { SignupValidator } from "../validators/SignupValidator.js";
 export default class AuthController {
 	async signup({ request, response }: HttpContext) {
 		const body = (await request.body()) ?? {};
-		const parsed = SignupValidator.validate(body);
+		const parsed = SignupValidator.validateResult(body);
 		if (!parsed.valid) {
 			response.status(422).json({ ok: false, errors: parsed.errors });
 			return;
@@ -55,7 +55,7 @@ export default class AuthController {
 
 	async login({ request, response }: HttpContext) {
 		const body = (await request.body()) ?? {};
-		const parsed = LoginValidator.validate(body);
+		const parsed = LoginValidator.validateResult(body);
 		if (!parsed.valid) {
 			// Same 401 used for bad credentials — never reveal whether
 			// the request failed format or credentials match.

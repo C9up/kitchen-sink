@@ -20,7 +20,7 @@ import { InviteValidator } from "../validators/InviteValidator.js";
 export default class WorkspaceController {
 	async create({ request, response, auth }: HttpContext) {
 		const callerId = auth.user!.id as string;
-		const parsed = CreateWorkspaceValidator.validate(
+		const parsed = CreateWorkspaceValidator.validateResult(
 			(await request.body()) ?? {},
 		);
 		if (!parsed.valid) {
@@ -60,7 +60,7 @@ export default class WorkspaceController {
 			return;
 		}
 
-		const parsed = InviteValidator.validate((await request.body()) ?? {});
+		const parsed = InviteValidator.validateResult((await request.body()) ?? {});
 		if (!parsed.valid) {
 			response.status(422).json({ ok: false, errors: parsed.errors });
 			return;

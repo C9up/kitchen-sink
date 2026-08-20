@@ -8,7 +8,7 @@
  *
  *   node --import @swc-node/register/esm-register bin/test.ts [suite...]
  */
-import { runTestsFromRcFile } from "@c9up/ream/test-runner";
+import { runTestsFromRcFile } from "@c9up/helix-plugin-ream/runner";
 
 const suites = process.argv.slice(2).filter((arg) => !arg.startsWith("-"));
 const threads = Number(

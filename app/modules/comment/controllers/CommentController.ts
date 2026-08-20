@@ -26,7 +26,7 @@ export default class CommentController {
 			return;
 		}
 
-		const parsed = CreateCommentValidator.validate((await request.body()) ?? {});
+		const parsed = CreateCommentValidator.validateResult((await request.body()) ?? {});
 		if (!parsed.valid) {
 			response.status(422).json({ ok: false, errors: parsed.errors });
 			return;

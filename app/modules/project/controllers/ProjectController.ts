@@ -32,7 +32,7 @@ export default class ProjectController {
 			return;
 		}
 
-		const parsed = CreateProjectValidator.validate((await request.body()) ?? {});
+		const parsed = CreateProjectValidator.validateResult((await request.body()) ?? {});
 		if (!parsed.valid) {
 			response.status(422).json({ ok: false, errors: parsed.errors });
 			return;
