@@ -1,0 +1,14 @@
+{
+  // Browser code: JSX, `import.meta.glob`, CSS side-effect imports. It is
+  // typechecked here rather than by the app's root config, which targets Node
+  // and has neither the DOM lib nor the bundler's ambient types — the same
+  // split AdonisJS makes between `tsconfig.app.json` and `tsconfig.client.json`.
+  "extends": "@c9up/ream/tsconfig.client.json",
+  "compilerOptions": {
+    // Supplied by the app, not by ream: the bundler is the app's choice, and
+    // `import.meta.glob` is Vite's.
+    "types": ["vite/client"]
+  },
+  "include": ["**/*.ts", "**/*.tsx", "**/*.vue", "**/*.svelte"],
+  "exclude": ["lang/**"]
+}

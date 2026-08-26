@@ -30,9 +30,21 @@ const bodyParser = new BodyParserMiddleware();
 // AuthMiddleware lands after it so the bearer token is parsed AFTER
 // the body has been sanitised (no behavioural dependency, just a
 // stable ordering).
-router.use([
+// `server.use()` — these are configured INSTANCES, and `router.use()` takes
+// lazy imports of middleware classes only (AdonisJS shape), which cannot carry
+// the session driver and secret set above. See the note at the bottom of this
+// file for what would let them move to `router.use()`.
+server.use([
 	blackholeMiddleware,
 	(ctx, next) => bodyParser.handle(ctx, next),
 	(ctx, next) => session.handle(ctx, next),
-	() => import("#middleware/auth_middleware.js"),
 ]);
+
+// A class import, so it goes on the router where AdonisJS puts auth.
+router.use([() => import("#middleware/auth_middleware.js")]);
+
+// NOTE — the AdonisJS spelling is
+// `router.use([() => import('@c9up/ream/session_middleware')])`, where the
+// middleware reads `config/session.ts` from the container instead of taking
+// its config through the constructor. Ream ships the class and the subpath but
+// no provider that configures it, so the instances above are still built here.

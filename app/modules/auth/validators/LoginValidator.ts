@@ -1,9 +1,14 @@
 import { rules, schema } from "@c9up/rune";
 
-export interface LoginInput {
+/**
+ * A `type`, not an `interface`: only a type alias gets an implicit index
+ * signature, so only a type alias is assignable to the
+ * `Record<string, unknown>` credentials that `auth.authenticate()` takes.
+ */
+export type LoginInput = {
 	email: string;
 	password: string;
-}
+};
 
 export const LoginValidator = schema<LoginInput>({
 	email: rules.string().trim().email(),

@@ -8,10 +8,13 @@ const renderer = new PhotonRenderer({
 	buildDir: "public/build/vue",
 });
 await renderer.boot();
-const result = await renderer.render("Home", {
-	user: { name: "Ada" },
-	count: 42,
-});
+// `render(component, props, url)` — the URL is required: the page payload
+// carries it so the client router can resume from the server render.
+const result = await renderer.render(
+	"Home",
+	{ user: { name: "Ada" }, count: 42 },
+	"/",
+);
 const html = result.html;
 
 const checks: Record<string, boolean> = {

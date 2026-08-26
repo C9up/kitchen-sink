@@ -57,8 +57,10 @@ describe("kitchen-sink > wiring > auth stack", () => {
 	it("@c9up/rune validates inputs against a schema", async () => {
 		const { rules, schema } = await import("@c9up/rune");
 		const s = schema<{ email: string }>({ email: rules.string().email() });
-		expect(s.validate({ email: "x@y.z" }).valid).toBe(true);
-		expect(s.validate({ email: "nope" }).valid).toBe(false);
+		// `validate` returns the validated data and throws on failure (VineJS
+		// shape); `validateResultAsync` is the never-throwing result form.
+		expect((await s.validateResultAsync({ email: "x@y.z" })).valid).toBe(true);
+		expect((await s.validateResultAsync({ email: "nope" })).valid).toBe(false);
 	});
 });
 

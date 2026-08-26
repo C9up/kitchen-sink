@@ -26,6 +26,10 @@ beforeAll(async () => {
 		.send();
 	ownerToken = (owner.json() as { token: string; user: { id: string } }).token;
 	ownerId = (owner.json() as { user: { id: string } }).user.id;
+	// Signup has to hand back the created user's id — the rest of this file
+	// authenticates as that owner, so an empty id would fail later and further
+	// from the cause.
+	expect(ownerId).toBeTruthy();
 
 	const member = await client
 		.post("/auth/signup")
@@ -410,5 +414,3 @@ describe("kitchen-sink > E2E > domain > notifications fanout", () => {
 		expect(res.status()).toBe(404);
 	});
 });
-
-void ownerId;
