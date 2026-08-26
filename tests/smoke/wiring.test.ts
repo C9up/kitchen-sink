@@ -59,8 +59,13 @@ describe("kitchen-sink > wiring > auth stack", () => {
 		const s = schema<{ email: string }>({ email: rules.string().email() });
 		// `validate` returns the validated data and throws on failure (VineJS
 		// shape); `validateResultAsync` is the never-throwing result form.
-		expect((await s.validateResultAsync({ email: "x@y.z" })).valid).toBe(true);
-		expect((await s.validateResultAsync({ email: "nope" })).valid).toBe(false);
+		// `x@y.z` used to stand in for a valid address here and does not qualify:
+		// validator.js — what VineJS validates with — requires a TLD of at least
+		// two characters (`{2,}` in isFQDN), so a one-letter TLD is rejected.
+		expect((await s.validateResultAsync({ email: "x@y.io" })).valid).toBe(true);
+		const failed = await s.validateResultAsync({ email: "nope" });
+		expect(failed.valid).toBe(false);
+		expect(failed.errors?.[0]?.rule).toBe("email");
 	});
 });
 
