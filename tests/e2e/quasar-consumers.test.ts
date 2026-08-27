@@ -22,7 +22,9 @@ import { test } from '@c9up/helix'
 const url = process.env.REDIS_TEST_URL ?? 'redis://127.0.0.1:6379'
 const manager = new QuasarManager({
   connection: 'main',
-  connections: { main: { url, db: 15 } },
+  // `lazyConnect` + one retry so the probe below fails fast instead of letting
+  // ioredis dial a dead port forever.
+  connections: { main: { url, db: 15, lazyConnect: true, maxRetriesPerRequest: 1 } },
 })
 
 const live = await manager
@@ -31,12 +33,24 @@ const live = await manager
   .then(() => true)
   .catch(() => false)
 
-if (live) setQuasar(manager)
+if (live) {
+  setQuasar(manager)
+} else {
+  // Close the probe. The only `quit()` used to live inside the last test, which
+  // returns early when there is no server — so a dead Redis left the connection
+  // open, ioredis kept retrying, and the file reported an ERROR instead of the
+  // graceful skip this header promises.
+  await manager.disconnect('main').catch(() => {})
+}
+
+// Reported as SKIPPED rather than passed. `if (!live) return` inside each test
+// counted four assertions-free bodies as green, which is the shape of a suite
+// that looks covered and is not.
+const testRedis = live ? test : test.skip
 
 const prefix = `kitchen:${process.pid}:`
 
-test('echo caches through the shared quasar connection', async ({ assert }) => {
-  if (!live) return
+testRedis('echo caches through the shared quasar connection', async ({ assert }) => {
   const cache = drivers.redis({ connection: 'main', prefix: `${prefix}cache:` })()
 
   await cache.set('user:42', { name: 'Hugo' }, 30)
@@ -44,8 +58,7 @@ test('echo caches through the shared quasar connection', async ({ assert }) => {
   await cache.delete('user:42')
 })
 
-test('bay queues through the shared quasar connection', async ({ assert }) => {
-  if (!live) return
+testRedis('bay queues through the shared quasar connection', async ({ assert }) => {
   const queue = new QueueDriver(bayConnection('main'), { prefix: `${prefix}queue:` })
   const job = {
     id: 'j1',
@@ -63,8 +76,7 @@ test('bay queues through the shared quasar connection', async ({ assert }) => {
   if (popped) await queue.complete(popped)
 })
 
-test('warden revokes through the shared quasar connection', async ({ assert }) => {
-  if (!live) return
+testRedis('warden revokes through the shared quasar connection', async ({ assert }) => {
   const blacklist = new RedisBlacklistDriver(wardenConnection('main'), { prefix: `${prefix}jwt:` })
 
   assert.isFalse(await blacklist.has('token-1'))
@@ -72,8 +84,7 @@ test('warden revokes through the shared quasar connection', async ({ assert }) =
   assert.isTrue(await blacklist.has('token-1'))
 })
 
-test('the three share one connection, not three', async ({ assert }) => {
-  if (!live) return
+testRedis('the three share one connection, not three', async ({ assert }) => {
   // Each driver above resolved through the same manager, so exactly one
   // connection is open — the point of owning the connection in one place.
   assert.deepEqual(manager.activeConnectionNames, ['main'])
