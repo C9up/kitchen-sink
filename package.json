@@ -39,26 +39,26 @@
     "@c9up/sigil": "workspace:*",
     "@c9up/spectrum": "workspace:*",
     "@c9up/warden": "workspace:*",
-    "react": "^19",
-    "react-dom": "^19",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "reflect-metadata": "^0.2.2",
-    "svelte": "^5",
-    "vue": "^3"
+    "svelte": "^5.57.0",
+    "vue": "^3.5.42"
   },
   "devDependencies": {
     "@c9up/helix": "workspace:*",
     "@c9up/helix-plugin-ream": "workspace:*",
-    "@sveltejs/vite-plugin-svelte": "^5",
-    "@swc-node/register": "^1.11.1",
-    "@tailwindcss/vite": "^4",
-    "@types/node": "*",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "@vitejs/plugin-react": "^4",
-    "@vitejs/plugin-vue": "^5",
-    "tailwindcss": "^4",
-    "tsx": "^4.20.6",
-    "typescript": "^6.0.2",
-    "vite": "^6"
+    "@sveltejs/vite-plugin-svelte": "^5.1.1",
+    "@swc-node/register": "^1.12.1",
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^22.20.1",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "@vitejs/plugin-vue": "^5.2.4",
+    "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.13",
+    "typescript": "^6.0.3",
+    "vite": "^7.3.6"
   }
 }
