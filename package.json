@@ -46,6 +46,7 @@
     "@c9up/rune": "workspace:*",
     "@c9up/sigil": "workspace:*",
     "@c9up/spectrum": "workspace:*",
+    "@c9up/station": "workspace:*",
     "@c9up/transit": "workspace:*",
     "@c9up/vellum": "workspace:*",
     "@c9up/warden": "workspace:*",

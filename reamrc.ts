@@ -17,6 +17,7 @@ export default defineConfig({
 		() => import("@c9up/bay/provider"),
 		() => import("@c9up/inker/provider"),
 		() => import("@c9up/rosetta/provider"),
+		() => import("@c9up/station/provider"),
 		() => import("@c9up/transit/provider"),
 		() => import("@c9up/prism/provider"),
 		() => import("@c9up/vellum/provider"),
@@ -45,6 +46,7 @@ export default defineConfig({
 		() => import("./start/finance.js"),
 		() => import("./start/sso.js"),
 		() => import("./start/views.js"),
+		() => import("./start/admin.js"),
 	],
 
 	modules: {
