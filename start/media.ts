@@ -1,12 +1,6 @@
 /**
  * Routes exercising prism (images) and vellum (PDF).
  *
- * Inker is NOT wired: its provider's `start()` returns early — leaving the
- * renderer permanently unstarted — and every later resolve then reports
- * "resolved before InkerProvider.start() ran", which fails the whole boot.
- * The dependency is not declared either. See the note in
- * tests/e2e/media.test.ts.
- *
  * Deliberately small and deliberately fed from the REQUEST: the properties
  * worth proving end to end are the ones that only hold against untrusted
  * input — inker escaping by default, prism refusing a bomb before it

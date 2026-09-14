@@ -1,14 +1,6 @@
 /**
  * Prism and Vellum through the real kernel.
  *
- * Inker is absent on purpose. Wiring `@c9up/inker/provider` into this app
- * fails the BOOT: its `start()` returns early without setting its started
- * flag — one of its two peer guards (`container.has("router")` / the Rosetta
- * shape) does not hold here even though RosettaProvider binds `"rosetta"`
- * specifically for it — and every later resolve raises "resolved before
- * InkerProvider.start() ran". Wiring it back means the dependency plus one
- * line in reamrc.ts, once that is settled.
- *
  * Each assertion here is one a unit test cannot make: the template has to be
  * the one the provider resolved from `resources/templates`, and the image
  * guards have to refuse an upload that arrived over the wire.

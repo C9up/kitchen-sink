@@ -32,6 +32,7 @@
     "@c9up/echo": "workspace:*",
     "@c9up/eclipse": "workspace:*",
     "@c9up/eon": "workspace:*",
+    "@c9up/inker": "workspace:*",
     "@c9up/nebula": "workspace:*",
     "@c9up/nova": "workspace:*",
     "@c9up/parsec": "workspace:*",

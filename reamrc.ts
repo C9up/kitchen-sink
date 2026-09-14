@@ -15,6 +15,7 @@ export default defineConfig({
 		() => import("@c9up/echo/provider"),
 		() => import("@c9up/eclipse/provider"),
 		() => import("@c9up/bay/provider"),
+		() => import("@c9up/inker/provider"),
 		() => import("@c9up/rosetta/provider"),
 		() => import("@c9up/transit/provider"),
 		() => import("@c9up/prism/provider"),
@@ -43,6 +44,7 @@ export default defineConfig({
 		() => import("./start/media.js"),
 		() => import("./start/finance.js"),
 		() => import("./start/sso.js"),
+		() => import("./start/views.js"),
 	],
 
 	modules: {
