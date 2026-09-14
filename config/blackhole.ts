@@ -18,6 +18,8 @@ export default defineConfig({
 			"/workspaces*",
 			"/projects*",
 			"/tasks*",
+			"/finance*",
+			"/media*",
 			"/invitations*",
 			"/me*",
 			"/__live*",

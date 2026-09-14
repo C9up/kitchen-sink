@@ -1,0 +1,3 @@
+<h1>{{ title }}</h1>
+<p class="bio">{{ bio }}</p>
+<p class="raw">{{{ trusted }}}</p>

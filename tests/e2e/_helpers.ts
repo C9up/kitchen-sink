@@ -28,6 +28,9 @@ import "reflect-metadata";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { getDb } from "@c9up/atlas/services/db";
+import { testUtils } from "@c9up/atlas/testing";
 import { Ignitor } from "@c9up/ream";
 import { createHyperServerFactory } from "@c9up/ream/bootstrap";
 import { TestClient } from "@c9up/ream/testing";
@@ -62,6 +65,34 @@ async function bootFn(
 		.useRcFile(rc)
 		.httpServer();
 	const started = await ignitor.start();
+
+	// Migrate the fresh database.
+	//
+	// This used to happen on its own: booting Atlas ran the pending
+	// migrations. It no longer does, deliberately — `AtlasProvider` refuses to
+	// migrate at boot because a rolling deploy had replicas racing each other
+	// over the same database. Nothing was added here to take over, so every
+	// suite has been booting against an EMPTY sqlite file: the validation
+	// paths still answered 422 while the writes answered 500 and the reads
+	// 401, and the header above went on claiming that "the same providers,
+	// migrations, NAPI binaries and WAL pragmas as production run here".
+	//
+	// `testUtils(...).db().migrate()` rather than a hand-built runner: it is
+	// the facade Atlas ships for exactly this, and it passes the connection's
+	// own dialect through — which a hand-built one does not, and the runner
+	// then fails on an empty identifier rather than on anything legible.
+	const connection = getDb();
+	if (!connection) {
+		throw new Error(
+			"kitchen-sink e2e: AtlasProvider published no default connection, so the fresh database cannot be migrated.",
+		);
+	}
+	await testUtils(connection, {
+		migrationsDir: fileURLToPath(new URL("database/migrations", APP_ROOT)),
+	})
+		.db()
+		.migrate();
+
 	return {
 		port: await started.port(),
 		close: async () => {

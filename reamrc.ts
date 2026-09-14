@@ -13,10 +13,23 @@ export default defineConfig({
 		() => import("@c9up/nova/provider"),
 		() => import("@c9up/relay/provider"),
 		() => import("@c9up/echo/provider"),
+		() => import("@c9up/eclipse/provider"),
 		() => import("@c9up/bay/provider"),
 		() => import("@c9up/rosetta/provider"),
+		() => import("@c9up/transit/provider"),
+		() => import("@c9up/prism/provider"),
+		() => import("@c9up/vellum/provider"),
 		() => import("@c9up/aurora/provider"),
+		() => import("@c9up/parsec/provider"),
 		() => import("@c9up/ream/rpc/provider"),
+
+		// Eon opens its TDengine connection AT BOOT, so registering it
+		// unconditionally would make the app unbootable for anyone without a
+		// server. Conditional on the URL being set, which is also how a
+		// deployment turns it on.
+		...(process.env.EON_URL
+			? [() => import("@c9up/eon/provider")]
+			: []),
 	],
 
 	preloads: [
@@ -26,6 +39,10 @@ export default defineConfig({
 		() => import("./start/web-session.js"),
 		() => import("./start/live.js"),
 		() => import("./start/rpc.js"),
+		() => import("./start/metrics.js"),
+		() => import("./start/media.js"),
+		() => import("./start/finance.js"),
+		() => import("./start/sso.js"),
 	],
 
 	modules: {

@@ -5,6 +5,7 @@
  * to populate `ctx.auth` before the guard enforcer runs.
  */
 import { blackholeMiddleware } from "@c9up/blackhole/middleware";
+import { parsecHttpMiddleware } from "@c9up/parsec/http";
 import { BodyParserMiddleware, SessionMiddleware } from "@c9up/ream";
 import router from "@c9up/ream/services/router";
 import server from "@c9up/ream/services/server";
@@ -35,6 +36,13 @@ const bodyParser = new BodyParserMiddleware();
 // the session driver and secret set above. See the note at the bottom of this
 // file for what would let them move to `router.use()`.
 server.use([
+	// Parsec on the GLOBAL pipeline, not on the router.
+	//
+	// Router middleware runs only for MATCHED routes, so a request that hit
+	// nothing never reaches it — and a 404 sweep, the one thing an error-rate
+	// chart most needs to show, would be invisible. Global is also where
+	// `<unmatched>` stops being a label nothing can produce.
+	parsecHttpMiddleware,
 	blackholeMiddleware,
 	(ctx, next) => bodyParser.handle(ctx, next),
 	(ctx, next) => session.handle(ctx, next),
