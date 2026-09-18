@@ -24,6 +24,7 @@ export default defineConfig({
 		() => import("@c9up/aurora/provider"),
 		() => import("@c9up/parsec/provider"),
 		() => import("@c9up/ream/rpc/provider"),
+		() => import("@c9up/ream/storage/provider"),
 
 		// Eon opens its TDengine connection AT BOOT, so registering it
 		// unconditionally would make the app unbootable for anyone without a
