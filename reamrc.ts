@@ -1,6 +1,18 @@
 import { defineConfig } from "@c9up/ream";
 
 export default defineConfig({
+	/**
+	 * The asset pipeline `ream dev` and `ream build` drive alongside the app.
+	 *
+	 * Vite runs in-process in development — the aurora provider mounts it — so
+	 * there is no `devServer` to start; only the one-shot build, which has to
+	 * run before the TypeScript build or the app would ship a bundle nobody
+	 * rebuilt.
+	 */
+	assets: {
+		build: { command: 'pnpm', args: ['build:front'] },
+	},
+
 	providers: [
 		() => import("@c9up/spectrum/provider"),
 		() => import("@c9up/atlas/provider"),

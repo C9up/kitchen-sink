@@ -8,7 +8,7 @@
 
 import { deflateSync, crc32 } from "node:zlib";
 import { test } from "@c9up/helix";
-import { createClient, forceExitAfter } from "./_helpers.js";
+import { createClient, forceExitAfter, textField } from "./_helpers.js";
 
 const client = createClient();
 
@@ -101,7 +101,7 @@ test.group("kitchen-sink > e2e > prism + vellum", (group) => {
 			.post("/media/inspect")
 			.json({ image: bomb.toString("base64") });
 		response.assertStatus(422);
-		assert.equal(response.body().code, "E_PRISM_TOO_MANY_PIXELS");
+		response.assertBodyContains({ code: "E_PRISM_TOO_MANY_PIXELS" });
 	});
 
 	test("prism refuses bytes that are not an image", async ({ assert }) => {
@@ -109,7 +109,7 @@ test.group("kitchen-sink > e2e > prism + vellum", (group) => {
 			.post("/media/inspect")
 			.json({ image: Buffer.from("<svg/>").toString("base64") });
 		response.assertStatus(422);
-		assert.equal(response.body().code, "E_PRISM_UNKNOWN_FORMAT");
+		response.assertBodyContains({ code: "E_PRISM_UNKNOWN_FORMAT" });
 	});
 
 	test("prism resizes through the whole pipeline", async ({ assert }) => {
@@ -117,7 +117,7 @@ test.group("kitchen-sink > e2e > prism + vellum", (group) => {
 			.post("/media/thumbnail")
 			.json({ image: makePng(200, 100).toString("base64") });
 		response.assertStatus(200);
-		const out = Buffer.from(response.body().base64, "base64");
+		const out = Buffer.from(textField(response.body(), "base64"), "base64");
 		const meta = (
 			await client.post("/media/inspect").json({ image: out.toString("base64") })
 		).body();

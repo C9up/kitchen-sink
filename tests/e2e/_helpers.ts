@@ -126,3 +126,37 @@ export function forceExitAfter(): void {
 		]).then(() => process.exit(0));
 	});
 }
+
+/**
+ * Read one field off a response body.
+ *
+ * `response.body()` is `unknown` on purpose — the client cannot know what a
+ * route answers, and saying otherwise would be the test asserting its own
+ * assumption. Where an assertion only compares values, `assertBodyContains`
+ * says it better than reaching in at all; this is for the rest, where the test
+ * needs the value itself — a URL to parse, base64 to decode, a shape to hand
+ * to somebody else's predicate.
+ *
+ * Absent is a failure here rather than `undefined` three lines later, because
+ * `undefined` compared against `undefined` passes.
+ */
+export function field(body: unknown, name: string): unknown {
+  if (typeof body !== 'object' || body === null || !(name in body)) {
+    throw new Error(`response body has no "${name}": ${JSON.stringify(body)}`)
+  }
+  return Reflect.get(body, name)
+}
+
+/** The same, for a field the test then treats as text. */
+export function textField(body: unknown, name: string): string {
+  const value = field(body, name)
+  if (typeof value !== 'string') {
+    throw new Error(`response body field "${name}" is not a string: ${JSON.stringify(value)}`)
+  }
+  return value
+}
+
+/** Whether a response body carries a field at all. */
+export function hasField(body: unknown, name: string): boolean {
+  return typeof body === 'object' && body !== null && name in body
+}

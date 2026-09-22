@@ -10,7 +10,7 @@
 import { Button } from "@c9up/nebula";
 import { renderToString } from "@c9up/aurora/ssr";
 import { test } from "@c9up/helix";
-import { createClient, forceExitAfter } from "./_helpers.js";
+import { createClient, field, forceExitAfter, textField } from "./_helpers.js";
 
 const client = createClient();
 
@@ -28,7 +28,7 @@ test.group("kitchen-sink > e2e > transit + nebula", (group) => {
 	}) => {
 		const response = await client.get("/auth/github/redirect");
 		response.assertStatus(200);
-		const url = new URL(response.body().url);
+		const url = new URL(textField(response.body(), "url"));
 		assert.equal(url.host, "github.com");
 		assert.equal(
 			url.searchParams.get("redirect_uri"),
@@ -42,21 +42,25 @@ test.group("kitchen-sink > e2e > transit + nebula", (group) => {
 	}) => {
 		// Without it the callback cannot be tied to the request that started
 		// the flow, which is the whole of the CSRF defence for OAuth.
-		const url = new URL((await client.get("/auth/github/redirect")).body().url);
+		const url = new URL(
+			textField((await client.get("/auth/github/redirect")).body(), "url"),
+		);
 		assert.equal(url.searchParams.get("state"), "state-123");
 	});
 
 	test("the requested scope is the one the config asked for", async ({
 		assert,
 	}) => {
-		const url = new URL((await client.get("/auth/github/redirect")).body().url);
+		const url = new URL(
+			textField((await client.get("/auth/github/redirect")).body(), "url"),
+		);
 		assert.include(url.searchParams.get("scope") ?? "", "read:user");
 	});
 
 	test("an unconfigured provider is a 404, not a 500", async ({ assert }) => {
 		const response = await client.get("/auth/gitlab/redirect");
 		response.assertStatus(404);
-		assert.isString(response.body().error);
+		assert.isString(field(response.body(), "error"));
 	});
 
 	test("nebula renders against the Aurora runtime this app pins", async ({

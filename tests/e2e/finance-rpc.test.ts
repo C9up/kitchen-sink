@@ -14,7 +14,7 @@
 
 import { buildRequest, isRpcShapedError } from "@c9up/comet/protocol";
 import { test } from "@c9up/helix";
-import { createClient, forceExitAfter } from "./_helpers.js";
+import { createClient, field, forceExitAfter, hasField } from "./_helpers.js";
 
 const client = createClient();
 
@@ -31,9 +31,9 @@ test.group("kitchen-sink > e2e > atom + comet", (group) => {
 		const response = await client.get("/finance/sum");
 		response.assertStatus(200);
 		// `toString()` carries the currency — the amount alone is not a price.
-		assert.equal(response.body().exact, "0.30 EUR");
+		response.assertBodyContains({ exact: "0.30 EUR" });
 		// The contrast is the point: the same sum in floating point.
-		assert.equal(response.body().float, "0.30000000000000004");
+		response.assertBodyContains({ float: "0.30000000000000004" });
 	});
 
 	test("splits a budget without losing a cent", async ({ assert }) => {
@@ -43,9 +43,9 @@ test.group("kitchen-sink > e2e > atom + comet", (group) => {
 			.post("/finance/split")
 			.json({ amount: "100.00", shares: 3 });
 		response.assertStatus(200);
-		const { parts, sum, total } = response.body();
-		assert.deepEqual(parts, ["33.34 EUR", "33.33 EUR", "33.33 EUR"]);
-		assert.equal(sum, total);
+		const body = response.body();
+		response.assertBodyContains({ parts: ["33.34 EUR", "33.33 EUR", "33.33 EUR"] });
+		assert.equal(field(body, "sum"), field(body, "total"));
 	});
 
 	test("the parts always sum back, for any share count", async ({ assert }) => {
@@ -53,7 +53,7 @@ test.group("kitchen-sink > e2e > atom + comet", (group) => {
 			const body = (
 				await client.post("/finance/split").json({ amount: "10.00", shares })
 			).body();
-			assert.equal(body.sum, "10.00 EUR", `for ${shares} shares`);
+			assert.equal(field(body, "sum"), "10.00 EUR", `for ${shares} shares`);
 		}
 	});
 
@@ -62,7 +62,7 @@ test.group("kitchen-sink > e2e > atom + comet", (group) => {
 			.post("/finance/split")
 			.json({ amount: "10.00", shares: 0 });
 		response.assertStatus(422);
-		assert.isString(response.body().error);
+		assert.isString(field(response.body(), "error"));
 	});
 
 	test("ream's /rpc answers a request comet built", async ({ assert }) => {
@@ -71,9 +71,8 @@ test.group("kitchen-sink > e2e > atom + comet", (group) => {
 		const request = buildRequest("demo.echo", { message: "hi" }, 1);
 		const response = await client.post("/rpc").json(request);
 		response.assertStatus(200);
-		assert.equal(response.body().jsonrpc, "2.0");
-		assert.equal(response.body().id, 1);
-		assert.isUndefined(response.body().error);
+		response.assertBodyContains({ jsonrpc: "2.0", id: 1 });
+		assert.isFalse(hasField(response.body(), "error"));
 	});
 
 	test("an unknown method comes back in comet's error shape", async ({
@@ -83,9 +82,10 @@ test.group("kitchen-sink > e2e > atom + comet", (group) => {
 			.post("/rpc")
 			.json(buildRequest("demo.nope", {}, 7));
 		const body = response.body();
-		assert.equal(body.id, 7);
+		response.assertBodyContains({ id: 7 });
 		// Recognised by comet's own predicate — the shape is the contract.
-		assert.isTrue(isRpcShapedError(body.error), JSON.stringify(body));
-		assert.equal(body.error.code, -32601);
+		const error = field(body, "error");
+		assert.isTrue(isRpcShapedError(error), JSON.stringify(body));
+		assert.equal(field(error, "code"), -32601);
 	});
 });
