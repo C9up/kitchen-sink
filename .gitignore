@@ -11,7 +11,8 @@ coverage/
 *.log
 
 # App-local working data
-data/*.db
+# sqlite writes -shm and -wal beside the file in WAL mode, so match the family
+data/*.db*
 data/storage/attachments/
 
 # Vite/Photon build output
