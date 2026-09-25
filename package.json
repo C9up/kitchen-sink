@@ -11,8 +11,8 @@
     "#start/*": "./start/*"
   },
   "scripts": {
-    "dev": "ream dev",
-    "start": "ream start",
+    "dev": "NODE_ENV=development ream dev",
+    "start": "NODE_ENV=production ream start",
     "console": "node --import @swc-node/register/esm-register bin/console.ts",
     "atlas:check": "node --import @swc-node/register/esm-register bin/console.ts atlas:check",
     "build:client": "vite build",
