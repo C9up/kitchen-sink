@@ -22,6 +22,11 @@ export default {
 	// per-package vitest runner started exercising kitchen-sink properly.
 	poolMin: 1,
 	poolMax: 1,
+	// Emit `db:query` in development so the debug toolbar's query panel has
+	// something to show. Off elsewhere, as upstream: with no subscriber the
+	// events cost nothing, but the flag is what a production connection is
+	// expected to carry.
+	debug: app.inDev,
 	// `busy_timeout=5000` rides alongside WAL — sqlite waits up to 5s for
 	// a competing writer / checkpoint to release before returning BUSY.
 	// Avoids spurious "database is locked" between consecutive test boots.
