@@ -31,7 +31,12 @@ registry.define("Counter", () => {
 });
 
 const live = createLiveRouter(registry, relay);
-wireLiveEvents(router, live); // POST /__live/event
+// POST /__live/event. The guard is required: an unguessable session id is a
+// secret, not an authorisation check. Demo: allow-all, because the mount below
+// is keyed by the request's own correlation id and there is no user to own it.
+// Production checks that the caller owns `body.id`, on the same policy as the
+// page that mounted the session.
+wireLiveEvents(router, live, () => true);
 
 // Relay is fail-closed: a channel with no authorizer rejects subscriptions
 // (403). Authorize the per-session live channel. (Demo: allow-all. Production:
