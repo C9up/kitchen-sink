@@ -16,7 +16,7 @@
     "console": "node --import @swc-node/register/esm-register bin/console.ts",
     "atlas:check": "node --import @swc-node/register/esm-register bin/console.ts atlas:check",
     "build:client": "vite build",
-    "build:ssr": "vite build --ssr resources/ssr.tsx --outDir public/build/ssr",
+    "build:ssr": "vite build --ssr resources/ssr.tsx --outDir build/ssr",
     "build:front": "pnpm build:client && pnpm build:ssr",
     "test": "node --import @swc-node/register/esm-register bin/test.ts",
     "build": "ream build"

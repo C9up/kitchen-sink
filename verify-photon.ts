@@ -4,7 +4,7 @@ const { PhotonRenderer } = await import("@c9up/photon");
 const renderer = new PhotonRenderer({
 	framework: "react",
 	entryClient: "resources/app.tsx",
-	entryServer: "resources/ssr.tsx",
+	ssr: { enabled: true, entrypoint: "resources/ssr.tsx" },
 	buildDir: "public/build",
 });
 await renderer.boot();

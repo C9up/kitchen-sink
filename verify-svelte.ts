@@ -4,8 +4,9 @@ const { PhotonRenderer } = await import("@c9up/photon");
 const renderer = new PhotonRenderer({
 	framework: "svelte",
 	entryClient: "resources/svelte/app.ts",
-	entryServer: "resources/svelte/ssr.ts",
+	ssr: { enabled: true, entrypoint: "resources/svelte/ssr.ts" },
 	buildDir: "public/build/svelte",
+	ssrBuildDir: "build/ssr/svelte",
 });
 await renderer.boot();
 // `render(component, props, url)` — the URL is required: the page payload

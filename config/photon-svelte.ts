@@ -4,7 +4,8 @@ import { defineConfig } from "@c9up/photon";
 export default defineConfig({
 	framework: "svelte",
 	entryClient: "resources/svelte/app.ts",
-	entryServer: "resources/svelte/ssr.ts",
+	ssr: { enabled: true, entrypoint: "resources/svelte/ssr.ts" },
 	buildDir: "public/build/svelte",
+	ssrBuildDir: "build/ssr/svelte",
 	viteDevUrl: "http://localhost:5173",
 });

@@ -6,7 +6,7 @@ import { defineConfig } from "vite";
  * Vite config for the Vue Photon demo. Same two-build flow as React:
  *   vite build -c vite.config.vue.ts                                  (client)
  *   vite build -c vite.config.vue.ts --ssr resources/vue/ssr.ts \
- *     --outDir public/build/vue/ssr                                   (SSR)
+ *     --outDir build/ssr/vue                                          (SSR)
  */
 export default defineConfig({
 	plugins: [vue(), tailwindcss()],

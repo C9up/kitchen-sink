@@ -6,7 +6,7 @@ import { defineConfig } from "vite";
  * Vite config for the Svelte 5 Photon demo:
  *   vite build -c vite.config.svelte.ts                                  (client)
  *   vite build -c vite.config.svelte.ts --ssr resources/svelte/ssr.ts \
- *     --outDir public/build/svelte/ssr                                   (SSR)
+ *     --outDir build/ssr/svelte                                          (SSR)
  */
 export default defineConfig({
 	plugins: [svelte(), tailwindcss()],

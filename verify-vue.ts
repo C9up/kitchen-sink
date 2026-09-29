@@ -4,8 +4,9 @@ const { PhotonRenderer } = await import("@c9up/photon");
 const renderer = new PhotonRenderer({
 	framework: "vue",
 	entryClient: "resources/vue/app.ts",
-	entryServer: "resources/vue/ssr.ts",
+	ssr: { enabled: true, entrypoint: "resources/vue/ssr.ts" },
 	buildDir: "public/build/vue",
+	ssrBuildDir: "build/ssr/vue",
 });
 await renderer.boot();
 // `render(component, props, url)` — the URL is required: the page payload

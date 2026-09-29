@@ -4,7 +4,8 @@ import { defineConfig } from "@c9up/photon";
 export default defineConfig({
 	framework: "vue",
 	entryClient: "resources/vue/app.ts",
-	entryServer: "resources/vue/ssr.ts",
+	ssr: { enabled: true, entrypoint: "resources/vue/ssr.ts" },
 	buildDir: "public/build/vue",
+	ssrBuildDir: "build/ssr/vue",
 	viteDevUrl: "http://localhost:5173",
 });

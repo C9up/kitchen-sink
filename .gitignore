@@ -17,3 +17,4 @@ data/storage/attachments/
 
 # Vite/Photon build output
 public/build/
+build/
