@@ -83,7 +83,7 @@ relay.registerRoutes((route) => {
 // subscribe. The `:id` capture is the project id; we walk
 // project → workspace → membership through the container-resolved
 // services. Returning `false` produces a 403 with
-// `E_CHANNEL_FORBIDDEN` on the subscribe endpoint.
+// `E_RELAY_CHANNEL_FORBIDDEN` on the subscribe endpoint.
 relay.authorize<{ id: string }>("project/:id", async (ctx, { id }) => {
 	const userId = ctx.auth?.user?.id;
 	if (typeof userId !== "string") return false;

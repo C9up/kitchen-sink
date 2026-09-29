@@ -235,34 +235,27 @@ describe("kitchen-sink > E2E > site > live page (aurora dist + shared page + hyd
 describe("kitchen-sink > E2E > site > relay SSE end-to-end", () => {
 	it("opens an SSE connection, subscribes, and receives a real-time event", async () => {
 		const baseUrl = `http://127.0.0.1:${client.port}`;
-		// The uid hint MUST match the authenticated user id — relay's
-		// `connect()` treats a mismatch as a hijack attempt (see
-		// Relay.connect docs). Using `memberId` here keeps the SSE
-		// handshake on the happy path.
-		const uid = memberId;
-
 		// 1. Open the SSE stream and start consuming chunks. The Abort
 		//    controller serves both for explicit close and as a safety
 		//    net so the test never hangs the helix worker.
 		const controller = new AbortController();
-		const res = await fetch(
-			`${baseUrl}/__relay/events?uid=${encodeURIComponent(uid)}`,
-			{
-				headers: {
-					authorization: `Bearer ${memberToken}`,
-					accept: "text/event-stream",
-				},
-				signal: controller.signal,
+		const res = await fetch(`${baseUrl}/__relay/events`, {
+			headers: {
+				authorization: `Bearer ${memberToken}`,
+				accept: "text/event-stream",
 			},
-		);
+			signal: controller.signal,
+		});
 		expect(res.status).toBe(200);
 		expect(res.headers.get("content-type")).toMatch(/text\/event-stream/);
 
 		const events = collectSseEvents(res, controller);
 
 		// 2. Wait for the "connected" event so we know the SSE writer is
-		//    primed and the uid is registered server-side.
-		await waitForEvent(events, (e) => e.event === "connected");
+		//    primed; the server issues the uid, in that frame.
+		const uid = uidOf(
+			await waitForEvent(events, (e) => e.event === "connected"),
+		);
 
 		// 3. Subscribe to the project channel.
 		const sub = await fetch(`${baseUrl}/__relay/subscribe`, {
@@ -298,7 +291,7 @@ describe("kitchen-sink > E2E > site > relay SSE end-to-end", () => {
 
 	it("rejects unauthenticated SSE connections with 401", async () => {
 		const baseUrl = `http://127.0.0.1:${client.port}`;
-		const res = await fetch(`${baseUrl}/__relay/events?uid=anon-uid`, {
+		const res = await fetch(`${baseUrl}/__relay/events`, {
 			// No Bearer token — `relay.registerRoutes((route) => route.guard('jwt'))`
 			// + the AuthMiddleware reject the request before the SSE upgrade.
 			headers: { accept: "text/event-stream" },
@@ -308,26 +301,23 @@ describe("kitchen-sink > E2E > site > relay SSE end-to-end", () => {
 
 	it("forbids subscriptions to channels with no registered authorizer", async () => {
 		const baseUrl = `http://127.0.0.1:${client.port}`;
-		// Authenticated user opens SSE → hint must match auth id (see test 1
-		// comment). The actual `subscribe` call below is what's expected to
-		// 403 because `secret/*` has no `relay.authorize(...)` registered.
-		const uid = memberId;
-
+		// The `subscribe` call below is what's expected to 403, because
+		// `secret/*` has no `relay.authorize(...)` registered.
 		const controller = new AbortController();
-		const res = await fetch(
-			`${baseUrl}/__relay/events?uid=${encodeURIComponent(uid)}`,
-			{
-				headers: {
-					accept: "text/event-stream",
-					authorization: `Bearer ${memberToken}`,
-				},
-				signal: controller.signal,
+		const res = await fetch(`${baseUrl}/__relay/events`, {
+			headers: {
+				accept: "text/event-stream",
+				authorization: `Bearer ${memberToken}`,
 			},
-		);
+			signal: controller.signal,
+		});
 		expect(res.status).toBe(200);
 
 		const events = collectSseEvents(res, controller);
-		await waitForEvent(events, (e) => e.event === "connected");
+		// The server issues the uid, in the first frame.
+		const uid = uidOf(
+			await waitForEvent(events, (e) => e.event === "connected"),
+		);
 
 		// `secret/anything` has no `relay.authorize(...)` registered.
 		// Secure-by-default rejects the subscription.
@@ -341,7 +331,7 @@ describe("kitchen-sink > E2E > site > relay SSE end-to-end", () => {
 		});
 		expect(sub.status).toBe(403);
 		const body = (await sub.json()) as { error?: { code?: string } };
-		expect(body.error?.code).toBe("E_CHANNEL_NO_AUTHORIZER");
+		expect(body.error?.code).toBe("E_RELAY_CHANNEL_NO_AUTHORIZER");
 
 		controller.abort();
 	});
@@ -349,7 +339,7 @@ describe("kitchen-sink > E2E > site > relay SSE end-to-end", () => {
 	it("forbids non-members from subscribing to a project channel", async () => {
 		// `nonMember` signs up but never gets invited to the workspace.
 		// `relay.authorize('project/:id')` resolves the project, finds no
-		// membership for nonMember.id, returns false → 403 E_CHANNEL_FORBIDDEN.
+		// membership for nonMember.id, returns false → 403 E_RELAY_CHANNEL_FORBIDDEN.
 		const outsider = await client
 			.post("/auth/signup")
 			.json({
@@ -360,34 +350,26 @@ describe("kitchen-sink > E2E > site > relay SSE end-to-end", () => {
 			})
 			.send();
 		expect(outsider.status()).toBe(201);
-		const outsiderJson = outsider.json() as {
-			token: string;
-			user: { id: string };
-		};
+		const outsiderJson = outsider.json() as { token: string };
 		const outsiderToken = outsiderJson.token;
-		const outsiderId = outsiderJson.user.id;
 
 		const baseUrl = `http://127.0.0.1:${client.port}`;
-		// Hint must match the outsider's authenticated id (same reason as
-		// tests 1 and 3). The 403 we're asserting comes from
-		// `relay.authorize('project/:id')`, not from a uid-hint mismatch.
-		const uid = outsiderId;
-
+		// The 403 we're asserting comes from `relay.authorize('project/:id')`.
 		const controller = new AbortController();
-		const res = await fetch(
-			`${baseUrl}/__relay/events?uid=${encodeURIComponent(uid)}`,
-			{
-				headers: {
-					accept: "text/event-stream",
-					authorization: `Bearer ${outsiderToken}`,
-				},
-				signal: controller.signal,
+		const res = await fetch(`${baseUrl}/__relay/events`, {
+			headers: {
+				accept: "text/event-stream",
+				authorization: `Bearer ${outsiderToken}`,
 			},
-		);
+			signal: controller.signal,
+		});
 		expect(res.status).toBe(200);
 
 		const events = collectSseEvents(res, controller);
-		await waitForEvent(events, (e) => e.event === "connected");
+		// The server issues the uid, in the first frame.
+		const uid = uidOf(
+			await waitForEvent(events, (e) => e.event === "connected"),
+		);
 
 		const sub = await fetch(`${baseUrl}/__relay/subscribe`, {
 			method: "POST",
@@ -399,7 +381,7 @@ describe("kitchen-sink > E2E > site > relay SSE end-to-end", () => {
 		});
 		expect(sub.status).toBe(403);
 		const body = (await sub.json()) as { error?: { code?: string } };
-		expect(body.error?.code).toBe("E_CHANNEL_FORBIDDEN");
+		expect(body.error?.code).toBe("E_RELAY_CHANNEL_FORBIDDEN");
 
 		controller.abort();
 	});
@@ -498,6 +480,13 @@ interface SseEventBuffer {
 		predicate: (e: SseEvent) => boolean,
 		timeoutMs?: number,
 	): Promise<SseEvent>;
+}
+
+/** The uid a `connected` frame carries. */
+function uidOf(event: SseEvent): string {
+	const uid: unknown = Reflect.get(Object(event.data), "uid");
+	if (typeof uid !== "string") throw new Error("connected frame without a uid");
+	return uid;
 }
 
 function waitForEvent(
