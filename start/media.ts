@@ -37,7 +37,7 @@ router.post("/media/thumbnail", async ({ request, response }) => {
 // The barrel's standalone `createBlank`/`inspect`, not the `services/main`
 // accessor: authoring needs no configuration, so vellum exposes it as a plain
 // function and the service object carries only the operations that do.
-router.get("/media/pdf", ({ response }) => {
+router.get("/media/pdf", async ({ response }) => {
 	const pdf = createBlank([A4]);
-	response.json(inspectPdf(pdf));
+	response.json(await inspectPdf(pdf));
 });
