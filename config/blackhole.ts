@@ -32,5 +32,5 @@ export default defineConfig({
 	// Demo CSP: allow the live-counter page's inline importmap + module. (Prod
 	// should use per-request nonces; blackhole's `@nonce` is the path — see the
 	// nonce request/response desync noted in the live-components work.)
-	securityHeaders: { csp: "default-src 'self'; script-src 'self' 'unsafe-inline'" },
+	csp: { policy: "default-src 'self'; script-src 'self' 'unsafe-inline'" },
 });
