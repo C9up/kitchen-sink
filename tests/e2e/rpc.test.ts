@@ -30,7 +30,16 @@ describe("kitchen-sink > e2e > json-rpc (aurora client ↔ real server)", () => 
 	});
 
 	it("calls demo.add with typed params + computed result", async () => {
-		const sum = await rpc.call<number>("demo.add", { a: 2, b: 3 });
+		const sum = await rpc.call(
+			"demo.add",
+			{ a: 2, b: 3 },
+			{
+				parse: (data) => {
+					if (typeof data !== "number") throw new TypeError("not a number");
+					return data;
+				},
+			},
+		);
 		expect(sum).toBe(5);
 	});
 
