@@ -6,11 +6,12 @@
  *
  * The server half is exercised by `tests/e2e/live.test.ts` (real Ignitor +
  * relay). The browser half (subscribe SSE + apply patches + forward clicks) is
- * the `<script type="module">` below — faithful to the documented API; its full
- * loop needs a real browser to validate (the logic is unit-proven in aurora).
+ * the `<script type="module">` below.
  */
 import "reflect-metadata";
+import { randomUUID } from "node:crypto";
 import {
+	authorizeLiveChannel,
 	createLiveRegistry,
 	createLiveRouter,
 	html,
@@ -31,22 +32,43 @@ registry.define("Counter", () => {
 });
 
 const live = createLiveRouter(registry, relay);
-// POST /__live/event. The guard is required: an unguessable session id is a
-// secret, not an authorisation check. Demo: allow-all, because the mount below
-// is keyed by the request's own correlation id and there is no user to own it.
-// Production checks that the caller owns `body.id`, on the same policy as the
-// page that mounted the session.
-wireLiveEvents(router, live, () => true);
 
-// Relay is fail-closed: a channel with no authorizer rejects subscriptions
-// (403). Authorize the per-session live channel. (Demo: allow-all. Production:
-// check that the subscriber owns the session id.)
-relay.authorize("live/:id", () => true);
+/**
+ * The principal a live session belongs to. The demo has no login, so each
+ * visitor gets an id kept in their (encrypted cookie) session; an app with
+ * users returns the user id instead. The page mounts with it, and the event
+ * route and the channel answer 403 to any other caller.
+ */
+const VISITOR_KEY = "live.visitor";
+
+function visitorOf(ctx: object): string | undefined {
+	// Read structurally: the event route types its context as aurora's slice,
+	// which does not name the session ream's SessionMiddleware puts there.
+	const session: unknown = Reflect.get(ctx, "session");
+	if (typeof session !== "object" || session === null) return undefined;
+	const get: unknown = Reflect.get(session, "get");
+	if (typeof get !== "function") return undefined;
+	const visitor: unknown = Reflect.apply(get, session, [VISITOR_KEY]);
+	return typeof visitor === "string" ? visitor : undefined;
+}
+
+// POST /__live/event — only the session's owner reaches it.
+wireLiveEvents(router, live, visitorOf);
+
+// Relay is fail-closed: a channel with no authorizer rejects subscriptions.
+// Only the session's owner may subscribe to its patches.
+relay.authorize<{ id: string }>(
+	"live/:id",
+	authorizeLiveChannel(live, visitorOf),
+);
 
 router.get("/live-counter", (ctx) => {
-	// Demo: mount keyed by the request correlation id. Production keys by the
-	// relay connection uid and wires relay-disconnect → live.disconnect(uid).
-	const { id, channel, html: markup } = live.mount("Counter", ctx.id);
+	let visitor = visitorOf(ctx);
+	if (visitor === undefined) {
+		visitor = randomUUID();
+		ctx.session?.put(VISITOR_KEY, visitor);
+	}
+	const { id, channel, html: markup } = live.mount("Counter", visitor);
 	ctx.response.send(`<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><title>Live Counter</title>
 <script type="importmap">{"imports":{"@c9up/aurora":"/__assets/aurora/index.js","@c9up/aurora/relay":"/__assets/aurora/relay.js"}}</script>
